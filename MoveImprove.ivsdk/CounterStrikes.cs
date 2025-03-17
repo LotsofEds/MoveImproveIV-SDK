@@ -5,6 +5,7 @@ using static IVSDKDotNet.Native.Natives;
 using CCL;
 using CCL.GTAIV;
 using IVSDKDotNet.Enums;
+using System.Collections;
 
 namespace MoveImprove.ivsdk
 {
@@ -15,29 +16,34 @@ namespace MoveImprove.ivsdk
         private static uint pedHealth;
         private static int pedHandle;
         private static float finisherTime;
+        private static int DmgLow;
+        private static int DmgMed;
+        private static int DmgHi;
+        private static int DmgBat;
+        private static int DmgKnife;
         private static void DamageLow()
         {
             IsCountering = true;
             GET_CHAR_HEALTH(pedHandle, out pedHealth);
-            SET_CHAR_HEALTH(pedHandle, (pedHealth - 12));
+            SET_CHAR_HEALTH(pedHandle, (pedHealth - 10));
         }
         private static void DamageMed()
         {
             IsCountering = true;
             GET_CHAR_HEALTH(pedHandle, out pedHealth);
-            SET_CHAR_HEALTH(pedHandle, (pedHealth - 18));
+            SET_CHAR_HEALTH(pedHandle, (pedHealth - 15));
         }
         private static void DamageHigh()
         {
             IsCountering = true;
             GET_CHAR_HEALTH(pedHandle, out pedHealth);
-            SET_CHAR_HEALTH(pedHandle, (pedHealth - 25));
+            SET_CHAR_HEALTH(pedHandle, (pedHealth - 30));
         }
         private static void DamageBat()
         {
             IsCountering = true;
             GET_CHAR_HEALTH(pedHandle, out pedHealth);
-            SET_CHAR_HEALTH(pedHandle, (pedHealth - 36));
+            SET_CHAR_HEALTH(pedHandle, (pedHealth - 50));
         }
         private static void DamageKnife()
         {
@@ -130,6 +136,7 @@ namespace MoveImprove.ivsdk
                 if (IS_CHAR_PLAYING_ANIM(pedHandle, "melee_counters", "hit_counter_back_2") && IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "melee_counters", "counter_back_2"))
                 {
                     GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "melee_counters", "counter_back_2", out CounterTime);
+                    
                     if (!IsCountering && CounterTime < 0.17 && CounterTime > 0.14)
                         DamageLow();
 
@@ -207,10 +214,10 @@ namespace MoveImprove.ivsdk
                 {
                     GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "melee_counters", "counter_back", out CounterTime);
                     if (!IsCountering && CounterTime < 0.205 && CounterTime > 0.17)
-                        DamageLow();
+                        DamageMed();
 
                     if (!IsCountering && CounterTime < 0.365 && CounterTime > 0.33)
-                        DamageLow();
+                        DamageMed();
 
                     if (IsCountering && (CounterTime > 0.365 || (CounterTime < 0.33 && CounterTime > 0.205)))
                         IsCountering = false;
@@ -220,10 +227,10 @@ namespace MoveImprove.ivsdk
                 {
                     GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "melee_counters", "counter_left", out CounterTime);
                     if (!IsCountering && CounterTime < 0.22 && CounterTime > 0.19)
-                        DamageLow();
+                        DamageMed();
 
                     if (!IsCountering && CounterTime < 0.36 && CounterTime > 0.33)
-                        DamageLow();
+                        DamageMed();
 
                     if (IsCountering && (CounterTime > 0.36 || (CounterTime < 0.33 && CounterTime > 0.22)))
                         IsCountering = false;
@@ -233,10 +240,10 @@ namespace MoveImprove.ivsdk
                 {
                     GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "melee_counters", "counter_right", out CounterTime);
                     if (!IsCountering && CounterTime < 0.185 && CounterTime > 0.15)
-                        DamageLow();
+                        DamageMed();
 
                     if (!IsCountering && CounterTime < 0.365 && CounterTime > 0.33)
-                        DamageLow();
+                        DamageMed();
 
                     if (IsCountering && (CounterTime > 0.365 || (CounterTime < 0.33 && CounterTime > 0.185)))
                         IsCountering = false;

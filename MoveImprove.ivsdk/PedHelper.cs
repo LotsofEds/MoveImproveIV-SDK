@@ -23,7 +23,7 @@ namespace MoveImprove.ivsdk
             {
                 UIntPtr ptr = pedPool.Get(i);
 
-                if (ptr != UIntPtr.Zero && ptr != Main.PlayerPed.GetUIntPtr())
+                if (ptr != UIntPtr.Zero)
                 {
                     int pedHandle = (int)pedPool.GetIndex(ptr);
                     PedHandles[ptr] = pedHandle;

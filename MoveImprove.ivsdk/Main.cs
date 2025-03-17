@@ -20,6 +20,7 @@ namespace MoveImprove.ivsdk
         public static bool ClimbDown;
         public static bool JumpFromLedges;
         public static bool FasterJacking;
+        public static bool FixRagdoll;
         public static float CombatRollSpeed;
         public static float PickupObjectSpeed;
         public static float ClimbAndShimmySpeed;
@@ -51,6 +52,7 @@ namespace MoveImprove.ivsdk
         private void Main_Initialized(object sender, EventArgs e)
         {
             LoadSettings(Settings);
+            RagdollFix.Init();
         }
 
         private void Main_Tick(object sender, EventArgs e)
@@ -64,6 +66,8 @@ namespace MoveImprove.ivsdk
             FastAnims.Tick();
             CounterStrikes.Tick();
             AdvancedClimbing.Tick();
+            if (FixRagdoll)
+                RagdollFix.Tick();
             if (Alt180Turn)
                 Alt180TurnScript.Tick();
             if (SprintToVehicles || ForceRun)
@@ -88,6 +92,7 @@ namespace MoveImprove.ivsdk
             ClimbDown = settings.GetBoolean("EXPERIMENTAL FEATURES", "ClimbDown", false);
             ClimbDownKey = settings.GetKey("EXPERIMENTAL FEATURES", "ClimbDownKey", Keys.J);
             JumpFromLedges = settings.GetBoolean("EXPERIMENTAL FEATURES", "JumpFromLedges", false);
+            FixRagdoll = settings.GetBoolean("MAIN", "RagdollFix", false);
         }
     }
 }

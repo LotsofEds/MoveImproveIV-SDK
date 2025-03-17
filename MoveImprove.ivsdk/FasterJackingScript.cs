@@ -24,7 +24,8 @@ namespace MoveImprove.ivsdk
             if (DateTime.Now.Subtract(currentDateTime).TotalMilliseconds > 100.0)
             {
                 CheckDateTime = false;
-                if (Main.PlayerPed.IsInVehicle())
+
+                if (IS_CHAR_GETTING_IN_TO_A_CAR(Main.PlayerHandle))
                 {
                     if (!IS_PED_JACKING(Main.PlayerHandle))
                         SET_CHAR_ALL_ANIMS_SPEED(Main.PlayerHandle, (Main.EnterExitVehSpeed));
@@ -113,10 +114,8 @@ namespace MoveImprove.ivsdk
                     SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "veh@bike_spt", "pullup_lhs", 1.25f);
                     SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "veh@bike_spt", "pullup_rhs", 1.5f);
                 }
-                if (Main.PlayerPed.IsInVehicle() && !IS_CHAR_SITTING_IN_ANY_CAR(Main.PlayerHandle) && !IS_CHAR_GETTING_IN_TO_A_CAR(Main.PlayerHandle))
-                {
+                if (IS_CHAR_IN_ANY_CAR(Main.PlayerHandle) && !IS_CHAR_SITTING_IN_ANY_CAR(Main.PlayerHandle) && !IS_CHAR_GETTING_IN_TO_A_CAR(Main.PlayerHandle))
                     SET_CHAR_ALL_ANIMS_SPEED(Main.PlayerHandle, (Main.EnterExitVehSpeed));
-                }
             }
         }
     }
