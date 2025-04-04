@@ -26,8 +26,6 @@ namespace MoveImprove.ivsdk
         private static bool myRagdoll;
         public static void Tick()
         {
-            PedHelper.GrabAllPeds();
-
             if (CheckDateTime == false)
             {
                 currentDateTime = DateTime.Now;
@@ -89,7 +87,7 @@ namespace MoveImprove.ivsdk
 
                     GET_CHAR_VELOCITY(pedHandle, out Vector3 pedVel);
                     GET_CHAR_HEIGHT_ABOVE_GROUND(pedHandle, out float gHeight);
-                    if ((pedVel.Z < -10.0 && !IS_PED_RAGDOLL(pedHandle) && gHeight > 4) || CounterTime > 0.5)
+                    if ((pedVel.Z < -10.0 && !IS_PED_RAGDOLL(pedHandle) && gHeight > 4) || CounterTime > 0.65)
                     {
                         pList.Add(pedHandle);
                         vList.Add(pedVel.Z);
@@ -114,7 +112,7 @@ namespace MoveImprove.ivsdk
 
             foreach (var vped in pList)
             {
-                if (aList[pList.IndexOf(vped)] > 0.5)
+                if (aList[pList.IndexOf(vped)] > 0.65)
                 {
                     SWITCH_PED_TO_RAGDOLL_WITH_FALL(vped, 1000, 1000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
                 }
