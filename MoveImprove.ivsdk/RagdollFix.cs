@@ -112,14 +112,13 @@ namespace MoveImprove.ivsdk
 
             foreach (var vped in pList)
             {
+                //IVGame.ShowSubtitleMessage(vped.ToString() + "   " + Main.PlayerHandle.ToString());
                 if (aList[pList.IndexOf(vped)] > 0.65)
-                {
                     SWITCH_PED_TO_RAGDOLL_WITH_FALL(vped, 1000, 1000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-                }
+
                 else if (vList[pList.IndexOf(vped)] < -10.0 && vped != Main.PlayerHandle)
-                {
                     SWITCH_PED_TO_RAGDOLL_WITH_FALL(vped, 9999, 9999, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-                }
+
             }
 
             if (!IS_PED_RAGDOLL(Main.PlayerHandle) && (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "dam_ko", "ko_back") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "dam_ko", "ko_collapse") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "dam_ko", "ko_front") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "dam_ko", "ko_left") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "dam_ko", "ko_right")))

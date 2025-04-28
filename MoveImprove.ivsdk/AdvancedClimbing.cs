@@ -142,18 +142,17 @@ namespace MoveImprove.ivsdk
                     GET_HEADING_FROM_VECTOR_2D(dir.X, dir.Y, out float camHdng);
                     SET_CHAR_HEADING(Main.PlayerHandle, camHdng);
                     FREEZE_CHAR_POSITION(Main.PlayerHandle, true);
-                    /*CREATE_OBJECT(GET_HASH_KEY("cj_game_cube_1"), Main.PlayerPos.X, Main.PlayerPos.Y, Main.PlayerPos.Z - 2.0f, out ObjHandle, true);
-                    SET_OBJECT_VISIBLE(ObjHandle, false);
-                    FREEZE_OBJECT_POSITION(ObjHandle, true);*/
                     Main.TheDelayedCaller.Add(TimeSpan.FromMilliseconds(80), "Main", () =>
                     {
                         FREEZE_CHAR_POSITION(Main.PlayerHandle, false);
-                        SET_CHAR_VELOCITY(Main.PlayerHandle, 0, 0, 2f);
+                        APPLY_FORCE_TO_PED(Main.PlayerHandle, 0, 0, 100, 200, 0, 0, 0, 0, 1, 1, 1);
+                        //SET_CHAR_VELOCITY
+                        //SET_CHAR_VELOCITY(Main.PlayerHandle, 0, 10f, 20f);
                         _TASK_SHIMMY(Main.PlayerHandle, 0);
                     });
                     Main.TheDelayedCaller.Add(TimeSpan.FromMilliseconds(250), "Main", () =>
                     {
-                        SET_CHAR_VELOCITY(Main.PlayerHandle, 0, 0, 2f);
+                        //SET_CHAR_VELOCITY(Main.PlayerHandle, 0, 0, 2f);
                     });
                     Main.TheDelayedCaller.Add(TimeSpan.FromMilliseconds(500), "Main", () =>
                     {

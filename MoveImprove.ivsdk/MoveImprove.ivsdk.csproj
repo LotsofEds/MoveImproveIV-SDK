@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="AdvancedClimbing.cs" />
     <Compile Include="Alt180TurnScript.cs" />
+    <Compile Include="FlipsNShit.cs" />
     <Compile Include="CounterStrikes.cs" />
     <Compile Include="DelayedCaller.cs" />
     <Compile Include="FastAnims.cs" />
@@ -58,6 +59,7 @@
     <Compile Include="ForceRunning.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="PedHelper.cs" />
+    <Compile Include="Prone.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RagdollFix.cs" />
   </ItemGroup>

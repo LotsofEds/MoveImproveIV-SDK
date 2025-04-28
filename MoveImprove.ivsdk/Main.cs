@@ -14,6 +14,7 @@ namespace MoveImprove.ivsdk
     {
         public static Keys ClimbDownKey;
         public static bool Alt180Turn;
+        public static bool QuickTurnStop;
         public static bool SprintToVehicles;
         public static bool ForceRun;
         public static bool ExtremeClimbing;
@@ -37,7 +38,16 @@ namespace MoveImprove.ivsdk
             Uninitialize += Main_Uninitialize;
             Initialized += Main_Initialized;
             Tick += Main_Tick;
+            //KeyDown += Main_KeyDown;
             TheDelayedCaller = new DelayedCalling();
+        }
+
+        public static void Main_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyValue == (int)Keys.M)
+            {
+                FlipsNShit.DoFlip();
+            }
         }
 
         private void Main_Uninitialize(object sender, EventArgs e)
@@ -53,6 +63,7 @@ namespace MoveImprove.ivsdk
         {
             LoadSettings(Settings);
             RagdollFix.Init();
+            //Prone.Init();
         }
 
         private void Main_Tick(object sender, EventArgs e)
@@ -65,6 +76,8 @@ namespace MoveImprove.ivsdk
             PedHelper.GrabAllPeds();
             FastAnims.Tick();
             CounterStrikes.Tick();
+            //Prone.Tick();
+            //FlipsNShit.Tick();
             AdvancedClimbing.Tick();
             if (FixRagdoll)
                 RagdollFix.Tick();
@@ -76,6 +89,12 @@ namespace MoveImprove.ivsdk
                 FasterJackingScript.Tick();
             TheDelayedCaller.Process();
         }
+        /*public static float Clamp(float value, float min, float max)
+        {
+            if (value < min) return min;
+            if (value > max) return max;
+            return value;
+        }*/
         private void LoadSettings(SettingsFile settings)
         {
             SprintToVehicles = settings.GetBoolean("MAIN", "SprintToVehicles", false);
@@ -88,6 +107,7 @@ namespace MoveImprove.ivsdk
             EnterExitVehSpeed = settings.GetFloat("ANIMATION SPEED", "EnterandExitVehicles", 1.0f);
             CrouchingSpeed = settings.GetFloat("ANIMATION SPEED", "Crouching", 1.0f);
             Alt180Turn = settings.GetBoolean("EXPERIMENTAL FEATURES", "Alt180Turn", false);
+            QuickTurnStop = settings.GetBoolean("EXPERIMENTAL FEATURES", "StopImmediately", false);
             ExtremeClimbing = settings.GetBoolean("EXPERIMENTAL FEATURES", "ExtremeClimbing", false);
             ClimbDown = settings.GetBoolean("EXPERIMENTAL FEATURES", "ClimbDown", false);
             ClimbDownKey = settings.GetKey("EXPERIMENTAL FEATURES", "ClimbDownKey", Keys.J);
