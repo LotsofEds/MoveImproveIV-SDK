@@ -48,6 +48,10 @@ namespace MoveImprove.ivsdk
             {
                 FlipsNShit.DoFlip();
             }
+            if (e.KeyValue == (int)Keys.N)
+            {
+                FlipsNShit.DoBackFlip();
+            }
         }
 
         private void Main_Uninitialize(object sender, EventArgs e)
@@ -73,6 +77,7 @@ namespace MoveImprove.ivsdk
             PlayerHandle = PlayerPed.GetHandle();
             PlayerPos = PlayerPed.Matrix.Pos;
 
+            TheDelayedCaller.Process();
             PedHelper.GrabAllPeds();
             FastAnims.Tick();
             CounterStrikes.Tick();
@@ -87,7 +92,6 @@ namespace MoveImprove.ivsdk
                 ForceRunning.Tick();
             if (FasterJacking)
                 FasterJackingScript.Tick();
-            TheDelayedCaller.Process();
         }
         /*public static float Clamp(float value, float min, float max)
         {

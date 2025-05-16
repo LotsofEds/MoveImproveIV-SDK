@@ -24,6 +24,8 @@ namespace MoveImprove.ivsdk
         private readonly static List<float> vList = new List<float>();
         private static List<float> aList = new List<float>();
         private static bool myRagdoll;
+        private static bool stopRagdoll;
+        private static bool isParachuting(int ped)=> (IS_CHAR_PLAYING_ANIM(ped, "parachute", "accelerate_2_idle") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "accelerate_loop") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "deccelerate") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "dec_2_acc") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "free_fall") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "free_fall_decelerate") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "free_fall_fast") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "free_fall_veer_left") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "free_fall_veer_right") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "full_brake_for_landing") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "full_brake_loop") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "hang_2_steer_l") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "hang_2_steer_r") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "hang_idle") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "hang_idle2") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "hang_2_steer_l") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "open_chute") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "steer_abwt_l") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "steer_abwt_r") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "steer_ab_l") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "steer_ab_r") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "steer_l") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "steer_l_less") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "steer_l_trans") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "steer_r") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "steer_r_less") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "steer_r_trans"));
         public static void Tick()
         {
             if (CheckDateTime == false)
@@ -116,16 +118,23 @@ namespace MoveImprove.ivsdk
                 if (aList[pList.IndexOf(vped)] > 0.65)
                     SWITCH_PED_TO_RAGDOLL_WITH_FALL(vped, 1000, 1000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
-                else if (vList[pList.IndexOf(vped)] < -10.0 && vped != Main.PlayerHandle)
+                else if (vList[pList.IndexOf(vped)] < -10.0 && vped != Main.PlayerHandle && !isParachuting(vped))
                     SWITCH_PED_TO_RAGDOLL_WITH_FALL(vped, 9999, 9999, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-
             }
 
             if (!IS_PED_RAGDOLL(Main.PlayerHandle) && (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "dam_ko", "ko_back") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "dam_ko", "ko_collapse") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "dam_ko", "ko_front") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "dam_ko", "ko_left") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "dam_ko", "ko_right")))
                 SWITCH_PED_TO_RAGDOLL_WITH_FALL(Main.PlayerHandle, 1000, 1000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
+            GET_CURRENT_CHAR_WEAPON(Main.PlayerHandle, out int pWeap);
             GET_CHAR_VELOCITY(Main.PlayerHandle, out Vector3 pVel);
-            if (pVel.Z < -10.0 && !IS_PED_RAGDOLL(Main.PlayerHandle))
+            GET_CHAR_HEIGHT_ABOVE_GROUND(Main.PlayerHandle, out float pDist);
+
+            if (IS_PED_RAGDOLL(Main.PlayerHandle) && pWeap == 41)
+                stopRagdoll = true;
+            else if (pVel.Z > -10.0)
+                stopRagdoll = false;
+
+            if (pVel.Z < -10.0 && !IS_PED_RAGDOLL(Main.PlayerHandle) && !isParachuting(Main.PlayerHandle) && !stopRagdoll)
             {
                 SWITCH_PED_TO_RAGDOLL_WITH_FALL(Main.PlayerHandle, -1, -1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
                 Main.TheDelayedCaller.Add(TimeSpan.FromMilliseconds(1000), "Main", () =>
