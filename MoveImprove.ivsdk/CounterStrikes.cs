@@ -58,6 +58,7 @@ namespace MoveImprove.ivsdk
                 pedHandle = ped.Value;
 
                 if (!DOES_CHAR_EXIST(pedHandle)) continue;
+                if (!LOCATE_CHAR_ON_FOOT_3D(pedHandle, Main.PlayerPos.X, Main.PlayerPos.Y, Main.PlayerPos.Z, 5, 5, 5, false)) continue;
                 if (IS_CHAR_DEAD(pedHandle)) continue;
                 if (IS_CHAR_INJURED(pedHandle)) continue;
                 if (IS_CHAR_SITTING_IN_ANY_CAR(pedHandle)) continue;

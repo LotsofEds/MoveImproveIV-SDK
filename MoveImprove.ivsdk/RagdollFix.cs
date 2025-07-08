@@ -20,9 +20,9 @@ namespace MoveImprove.ivsdk
         IVPed myPed;
         private static bool CheckDateTime;
         private static DateTime currentDateTime;
-        private readonly static List<int> pList = new List<int>();
-        private readonly static List<float> vList = new List<float>();
-        private static List<float> aList = new List<float>();
+        public readonly static List<int> pList = new List<int>();
+        public readonly static List<float> vList = new List<float>();
+        public static List<float> aList = new List<float>();
         private static bool myRagdoll;
         private static bool stopRagdoll;
         private static bool isParachuting(int ped)=> (IS_CHAR_PLAYING_ANIM(ped, "parachute", "accelerate_2_idle") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "accelerate_loop") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "deccelerate") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "dec_2_acc") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "free_fall") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "free_fall_decelerate") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "free_fall_fast") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "free_fall_veer_left") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "free_fall_veer_right") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "full_brake_for_landing") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "full_brake_loop") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "hang_2_steer_l") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "hang_2_steer_r") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "hang_idle") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "hang_idle2") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "hang_2_steer_l") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "open_chute") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "steer_abwt_l") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "steer_abwt_r") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "steer_ab_l") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "steer_ab_r") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "steer_l") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "steer_l_less") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "steer_l_trans") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "steer_r") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "steer_r_less") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "steer_r_trans"));
@@ -33,13 +33,14 @@ namespace MoveImprove.ivsdk
                 currentDateTime = DateTime.Now;
                 CheckDateTime = true;
             }
-            if (DateTime.Now.Subtract(currentDateTime).TotalMilliseconds > 50.0)
+            if (DateTime.Now.Subtract(currentDateTime).TotalMilliseconds > 100.0)
             {
                 CheckDateTime = false;
                 foreach (var ped in PedHelper.PedHandles)
                 {
                     int pedHandle = ped.Value;
                     if (pList.Contains(pedHandle)) continue;
+                    if (!LOCATE_CHAR_ON_FOOT_3D(pedHandle, Main.PlayerPos.X, Main.PlayerPos.Y, Main.PlayerPos.Z, 30, 30, 30, false)) continue;
                     //myPed = NativeWorld.GetPedInstanceFromHandle(pedHandle);
                     float CounterTime = 0;
 
@@ -101,7 +102,7 @@ namespace MoveImprove.ivsdk
 
             if (pList.Count > 0)
             {
-                for (int i = pList.Count - 1; i >= 0; i--)
+                for (int i = 0; i < pList.Count; i++)
                 {
                     if (!DOES_CHAR_EXIST(pList[i]) || IS_CHAR_DEAD(pList[i]) || IS_PED_RAGDOLL(pList[i]))
                     {

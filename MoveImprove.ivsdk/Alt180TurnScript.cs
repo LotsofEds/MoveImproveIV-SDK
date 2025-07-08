@@ -55,7 +55,12 @@ namespace MoveImprove.ivsdk
         public static void Tick()
         {
             REQUEST_ANIMS("move_player");
-            if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_player", "sprint_turn_180_r"))
+            if (NativeControls.IsGameKeyPressed(0, GameKey.Sprint) && (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_player", "walk_turn_180_l") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_player", "walk_turn_180_r")))
+            {
+                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "move_player", "walk_turn_180_l", 1.5f);
+                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "move_player", "walk_turn_180_r", 1.5f);
+            }
+            else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_player", "sprint_turn_180_r"))
             {
                 GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_player", "sprint_turn_180_r", out turnpntr);
                 if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))

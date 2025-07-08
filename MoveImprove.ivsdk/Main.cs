@@ -61,6 +61,9 @@ namespace MoveImprove.ivsdk
                 TheDelayedCaller.ClearAll();
                 TheDelayedCaller = null;
             }
+            RagdollFix.pList.Clear();
+            RagdollFix.vList.Clear();
+            RagdollFix.aList.Clear();
         }
 
         private void Main_Initialized(object sender, EventArgs e)
