@@ -16,11 +16,6 @@ namespace MoveImprove.ivsdk
         private static uint pedHealth;
         private static int pedHandle;
         private static float finisherTime;
-        private static int DmgLow;
-        private static int DmgMed;
-        private static int DmgHi;
-        private static int DmgBat;
-        private static int DmgKnife;
         private static void DamageLow()
         {
             IsCountering = true;

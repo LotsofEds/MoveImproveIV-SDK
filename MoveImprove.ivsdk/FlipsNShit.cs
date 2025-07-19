@@ -47,7 +47,7 @@ namespace MoveImprove.ivsdk
             {
                 if (!IS_CHAR_GETTING_UP(Main.PlayerHandle) && !IS_CHAR_SWIMMING(Main.PlayerHandle) && !IS_CHAR_SITTING_IN_ANY_CAR(Main.PlayerHandle) && !IS_CHAR_GETTING_IN_TO_A_CAR(Main.PlayerHandle) && !IS_PED_RAGDOLL(Main.PlayerHandle) && !IS_CHAR_IN_AIR(Main.PlayerHandle) && !IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "misskbtruck", "jump_grab"))
                 {
-                    IVGame.ShowSubtitleMessage(Main.PlayerPed.GetHeading().ToString() + "   " + NativeCamera.GetGameCam().Rotation.Z + 180.ToString());
+                    //IVGame.ShowSubtitleMessage(Main.PlayerPed.GetHeading().ToString() + "   " + NativeCamera.GetGameCam().Rotation.Z + 180.ToString());
                     if (!HAVE_ANIMS_LOADED("misskbtruck"))
                         REQUEST_ANIMS("misskbtruck");
                     else

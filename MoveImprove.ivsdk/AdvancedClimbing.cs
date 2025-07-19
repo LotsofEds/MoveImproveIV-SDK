@@ -14,10 +14,10 @@ namespace MoveImprove.ivsdk
         private static float groundDist, objDist;
         private static int ObjHandle;
         private static int LdrHandle;
-        private static UIntPtr ObjPtr;
+        //private static UIntPtr ObjPtr;
         private static float hdng;
         private static bool IsGrabbingLedge;
-        private static bool DeleteObj;
+        //private static bool DeleteObj;
         private static bool DoClimbDown;
         private static bool CanClimbDown;
         private static bool onLadder;
@@ -103,11 +103,10 @@ namespace MoveImprove.ivsdk
                     {
                         if (NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !IsGrabbingLedge)
                         {
-                            IsGrabbingLedge = true;
                             if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "climb_std", "climb_idle"))
-                            {
                                 GET_CHAR_HEADING(Main.PlayerHandle, out hdng);
-                            }
+
+                            IsGrabbingLedge = true;
                         }
                     });
                 }
@@ -118,10 +117,13 @@ namespace MoveImprove.ivsdk
                 else if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && IsGrabbingLedge && (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "climb_std", "climb_idle")))
                 {
                     IsGrabbingLedge = false;
-                    CLEAR_CHAR_TASKS_IMMEDIATELY(Main.PlayerHandle);
-                    SET_CHAR_HEADING(Main.PlayerHandle, hdng);
-                    _TASK_SHIMMY(Main.PlayerHandle, 0);
-                    FREEZE_CHAR_POSITION(Main.PlayerHandle, false);
+                    if (Main.OldLedgeMethod)
+                    {
+                        CLEAR_CHAR_TASKS_IMMEDIATELY(Main.PlayerHandle);
+                        SET_CHAR_HEADING(Main.PlayerHandle, hdng);
+                        _TASK_SHIMMY(Main.PlayerHandle, 0);
+                        FREEZE_CHAR_POSITION(Main.PlayerHandle, false);
+                    }
                 }
             }
         }
@@ -130,35 +132,47 @@ namespace MoveImprove.ivsdk
         {
             if (NativeControls.IsGameKeyPressed(0, GameKey.Aim) && IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "climb_std", "climb_idle"))
             {
-                FREEZE_CHAR_POSITION(Main.PlayerHandle, true);
-                _TASK_PLAY_ANIM_NON_INTERRUPTABLE(Main.PlayerHandle, "climb_idle", "climb_std", 8.0f, 0, 1, 0, 0, -1);
-                SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "climb_std", "climb_idle", 0.01f);
-                if (NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && NativeControls.IsGameKeyPressed(0, GameKey.Action))
+                if (Main.OldLedgeMethod)
                 {
-                    IsGrabbingLedge = false;
-                    CLEAR_CHAR_TASKS_IMMEDIATELY(Main.PlayerHandle);
+                    FREEZE_CHAR_POSITION(Main.PlayerHandle, true);
+                    _TASK_PLAY_ANIM_NON_INTERRUPTABLE(Main.PlayerHandle, "climb_idle", "climb_std", 8.0f, 0, 1, 0, 0, -1);
+                    SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "climb_std", "climb_idle", 0.01f);
+                    if (NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && NativeControls.IsGameKeyPressed(0, GameKey.Action))
+                    {
+                        IsGrabbingLedge = false;
+                        CLEAR_CHAR_TASKS_IMMEDIATELY(Main.PlayerHandle);
+                        NativeCamera cam = NativeCamera.GetGameCam();
+                        Vector3 dir = cam.Direction;
+                        GET_HEADING_FROM_VECTOR_2D(dir.X, dir.Y, out float camHdng);
+                        SET_CHAR_HEADING(Main.PlayerHandle, camHdng);
+                        FREEZE_CHAR_POSITION(Main.PlayerHandle, true);
+                        Main.TheDelayedCaller.Add(TimeSpan.FromMilliseconds(80), "Main", () =>
+                        {
+                            FREEZE_CHAR_POSITION(Main.PlayerHandle, false);
+                            APPLY_FORCE_TO_PED(Main.PlayerHandle, 0, 0, 100, 250, 0, 0, 0, 0, 1, 1, 1);
+                            _TASK_SHIMMY(Main.PlayerHandle, 0);
+                        });
+                    }
+                }
+                else
+                {
                     NativeCamera cam = NativeCamera.GetGameCam();
                     Vector3 dir = cam.Direction;
                     GET_HEADING_FROM_VECTOR_2D(dir.X, dir.Y, out float camHdng);
                     SET_CHAR_HEADING(Main.PlayerHandle, camHdng);
-                    FREEZE_CHAR_POSITION(Main.PlayerHandle, true);
-                    Main.TheDelayedCaller.Add(TimeSpan.FromMilliseconds(80), "Main", () =>
+
+                    if (NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && NativeControls.IsGameKeyPressed(0, GameKey.Action))
                     {
-                        FREEZE_CHAR_POSITION(Main.PlayerHandle, false);
-                        APPLY_FORCE_TO_PED(Main.PlayerHandle, 0, 0, 100, 200, 0, 0, 0, 0, 1, 1, 1);
-                        //SET_CHAR_VELOCITY
-                        //SET_CHAR_VELOCITY(Main.PlayerHandle, 0, 10f, 20f);
-                        _TASK_SHIMMY(Main.PlayerHandle, 0);
-                    });
-                    Main.TheDelayedCaller.Add(TimeSpan.FromMilliseconds(250), "Main", () =>
-                    {
-                        //SET_CHAR_VELOCITY(Main.PlayerHandle, 0, 0, 2f);
-                    });
-                    Main.TheDelayedCaller.Add(TimeSpan.FromMilliseconds(500), "Main", () =>
-                    {
-                        if (DOES_OBJECT_EXIST(ObjHandle))
-                            DELETE_OBJECT(ref ObjHandle);
-                    });
+                        IsGrabbingLedge = false;
+                        CLEAR_CHAR_TASKS_IMMEDIATELY(Main.PlayerHandle);
+                        FREEZE_CHAR_POSITION(Main.PlayerHandle, true);
+                        Main.TheDelayedCaller.Add(TimeSpan.FromMilliseconds(80), "Main", () =>
+                        {
+                            FREEZE_CHAR_POSITION(Main.PlayerHandle, false);
+                            APPLY_FORCE_TO_PED(Main.PlayerHandle, 0, 0, 100, 250, 0, 0, 0, 0, 1, 1, 1);
+                            _TASK_SHIMMY(Main.PlayerHandle, 0);
+                        });
+                    }
                 }
             }
         }

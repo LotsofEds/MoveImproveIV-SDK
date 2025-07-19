@@ -119,7 +119,7 @@ namespace MoveImprove.ivsdk
                 if (aList[pList.IndexOf(vped)] > 0.65)
                     SWITCH_PED_TO_RAGDOLL_WITH_FALL(vped, 1000, 1000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
-                else if (vList[pList.IndexOf(vped)] < -10.0 && vped != Main.PlayerHandle && !isParachuting(vped))
+                else if (vList[pList.IndexOf(vped)] < -10.0 && vped != Main.PlayerHandle && !isParachuting(vped) && IS_CHAR_IN_AIR(vped))
                     SWITCH_PED_TO_RAGDOLL_WITH_FALL(vped, 9999, 9999, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
             }
 
@@ -135,7 +135,7 @@ namespace MoveImprove.ivsdk
             else if (pVel.Z > -10.0)
                 stopRagdoll = false;
 
-            if (pVel.Z < -10.0 && !IS_PED_RAGDOLL(Main.PlayerHandle) && !isParachuting(Main.PlayerHandle) && !stopRagdoll)
+            if (pVel.Z < -10.0 && !IS_PED_RAGDOLL(Main.PlayerHandle) && !isParachuting(Main.PlayerHandle) && IS_CHAR_IN_AIR(Main.PlayerHandle) && !stopRagdoll)
             {
                 SWITCH_PED_TO_RAGDOLL_WITH_FALL(Main.PlayerHandle, -1, -1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
                 Main.TheDelayedCaller.Add(TimeSpan.FromMilliseconds(1000), "Main", () =>

@@ -22,6 +22,7 @@ namespace MoveImprove.ivsdk
         public static bool JumpFromLedges;
         public static bool FasterJacking;
         public static bool FixRagdoll;
+        public static bool OldLedgeMethod;
         public static float CombatRollSpeed;
         public static float PickupObjectSpeed;
         public static float ClimbAndShimmySpeed;
@@ -38,7 +39,7 @@ namespace MoveImprove.ivsdk
             Uninitialize += Main_Uninitialize;
             Initialized += Main_Initialized;
             Tick += Main_Tick;
-            //KeyDown += Main_KeyDown;
+            KeyDown += Main_KeyDown;
             TheDelayedCaller = new DelayedCalling();
         }
 
@@ -85,7 +86,7 @@ namespace MoveImprove.ivsdk
             FastAnims.Tick();
             CounterStrikes.Tick();
             //Prone.Tick();
-            //FlipsNShit.Tick();
+            FlipsNShit.Tick();
             AdvancedClimbing.Tick();
             if (FixRagdoll)
                 RagdollFix.Tick();
@@ -95,6 +96,7 @@ namespace MoveImprove.ivsdk
                 ForceRunning.Tick();
             if (FasterJacking)
                 FasterJackingScript.Tick();
+            GrabAndThrow.Tick();
         }
         /*public static float Clamp(float value, float min, float max)
         {
@@ -115,6 +117,7 @@ namespace MoveImprove.ivsdk
             CrouchingSpeed = settings.GetFloat("ANIMATION SPEED", "Crouching", 1.0f);
             Alt180Turn = settings.GetBoolean("EXPERIMENTAL FEATURES", "Alt180Turn", false);
             QuickTurnStop = settings.GetBoolean("EXPERIMENTAL FEATURES", "StopImmediately", false);
+            OldLedgeMethod = settings.GetBoolean("EXPERIMENTAL FEATURES", "OldJumpFromLedgeMethod", false);
             ExtremeClimbing = settings.GetBoolean("EXPERIMENTAL FEATURES", "ExtremeClimbing", false);
             ClimbDown = settings.GetBoolean("EXPERIMENTAL FEATURES", "ClimbDown", false);
             ClimbDownKey = settings.GetKey("EXPERIMENTAL FEATURES", "ClimbDownKey", Keys.J);
