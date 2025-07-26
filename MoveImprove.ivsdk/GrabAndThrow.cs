@@ -24,7 +24,7 @@ namespace MoveImprove.ivsdk
             GET_CURRENT_CHAR_WEAPON(Main.PlayerHandle, out int pWeap);
             if (pWeap == 0 && (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "melee_counters", "dodge_back") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "melee_counters", "dodge_l") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "melee_counters", "dodge_r")))
             {
-                if (!IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "veh@low", "jack_perp_ds") && !IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "veh@low", "jack_perp_ps") && (NativeControls.IsGameKeyPressed(0, GameKey.Action) || NativeControls.IsGameKeyPressed(0, GameKey.Action)))
+                if (!IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "veh@low", "jack_perp_ds") && !IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "veh@low", "jack_perp_ps") && (NativeControls.IsGameKeyPressed(0, Main.GrabKey) || NativeControls.IsGameKeyPressed(0, Main.GrabKey)))
                 {
                     //if (!HAVE_ANIMS_LOADED("misspackie1"))
                     //REQUEST_ANIMS("misspackie1");
@@ -87,9 +87,8 @@ namespace MoveImprove.ivsdk
                 if (leftCounter && IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "veh@low", "jack_perp_ds"))
                 {
                     if (!IS_PED_RAGDOLL(currPed))
-                        SWITCH_PED_TO_RAGDOLL_WITH_FALL(currPed, 2500, 2500, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-                    else
                     {
+                        SWITCH_PED_TO_RAGDOLL_WITH_FALL(currPed, 2500, 2500, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
                         APPLY_FORCE_TO_PED(currPed, 3, 4, -1, 0, 0, 0, 0, 0, 1, 1, 1);
                         currPed = -1;
                     }
@@ -97,9 +96,8 @@ namespace MoveImprove.ivsdk
                 else if (rightCounter && IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "veh@low", "jack_perp_ps"))
                 {
                     if (!IS_PED_RAGDOLL(currPed))
-                        SWITCH_PED_TO_RAGDOLL_WITH_FALL(currPed, 2500, 2500, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-                    else
                     {
+                        SWITCH_PED_TO_RAGDOLL_WITH_FALL(currPed, 2500, 2500, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
                         APPLY_FORCE_TO_PED(currPed, 3, -4, -1, 0, 0, 0, 0, 0, 1, 1, 1);
                         currPed = -1;
                     }
