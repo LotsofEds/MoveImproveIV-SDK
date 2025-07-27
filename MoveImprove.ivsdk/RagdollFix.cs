@@ -106,9 +106,9 @@ namespace MoveImprove.ivsdk
                 {
                     if (!DOES_CHAR_EXIST(pList[i]) || IS_CHAR_DEAD(pList[i]) || IS_PED_RAGDOLL(pList[i]))
                     {
-                        pList.Remove(pList[i]);
-                        vList.Remove(vList[i]);
-                        aList.Remove(aList[i]);
+                        pList.RemoveAt(i);
+                        vList.RemoveAt(i);
+                        aList.RemoveAt(i);
                     }
                 }
             }
@@ -155,8 +155,13 @@ namespace MoveImprove.ivsdk
                 });
             }
         }
-
         public static void Init()
+        {
+            pList.Clear();
+            vList.Clear();
+            aList.Clear();
+        }
+        public static void UnInit()
         {
             pList.Clear();
             vList.Clear();

@@ -26,13 +26,16 @@ namespace MoveImprove.ivsdk
         {
             if (!IS_PED_RAGDOLL(Main.PlayerHandle))
             {
-                REQUEST_ANIMS("move_crouch");
-                REQUEST_ANIMS("get_up");
+                if (!HAVE_ANIMS_LOADED("move_crouch"))
+                    REQUEST_ANIMS("move_crouch");
+                if (!HAVE_ANIMS_LOADED("ragdoll_trans"))
+                    REQUEST_ANIMS("ragdoll_trans");
                 Main.PlayerPed.ActivateDrunkRagdoll(500);
                 Main.TheDelayedCaller.Add(TimeSpan.FromMilliseconds(40), "Main", () =>
                 {
                     PlyrPos = Main.PlayerPos;
                     BLEND_FROM_NM_WITH_ANIM(Main.PlayerHandle, "move_crouch", "crouchidle2idle", 10, 0, 0, 0);
+                    REMOVE_ANIMS("move_crouch");
                     Main.TheDelayedCaller.Add(TimeSpan.FromMilliseconds(50), "Main", () =>
                     {
                         FREEZE_CHAR_POSITION(Main.PlayerHandle, true);
@@ -41,6 +44,7 @@ namespace MoveImprove.ivsdk
                             FREEZE_CHAR_POSITION(Main.PlayerHandle, false);
                             SET_CHAR_COORDINATES(Main.PlayerHandle, new Vector3(PlyrPos.X, PlyrPos.Y, (PlyrPos.Z - 0.5f)));
                             _TASK_PLAY_ANIM_NON_INTERRUPTABLE(Main.PlayerHandle, "recover_balance", "ragdoll_trans", 2, 0, 0, 0, 0, -1);
+                            REMOVE_ANIMS("ragdoll_trans");
                             speedUp = true;
                         });
                     });

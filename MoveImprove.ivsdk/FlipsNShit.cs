@@ -43,18 +43,22 @@ namespace MoveImprove.ivsdk
         }
         public static void Tick()
         {
-            if (NativeControls.IsGameKeyPressed(0, GameKey.Aim) && NativeControls.IsGameKeyPressed(0, GameKey.RadarZoom))
+            if (Main.TackleEnable)
             {
-                if (!IS_CHAR_GETTING_UP(Main.PlayerHandle) && !IS_CHAR_SWIMMING(Main.PlayerHandle) && !IS_CHAR_SITTING_IN_ANY_CAR(Main.PlayerHandle) && !IS_CHAR_GETTING_IN_TO_A_CAR(Main.PlayerHandle) && !IS_PED_RAGDOLL(Main.PlayerHandle) && !IS_CHAR_IN_AIR(Main.PlayerHandle) && !IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "misskbtruck", "jump_grab"))
+                if (NativeControls.IsGameKeyPressed(0, GameKey.Aim) && NativeControls.IsGameKeyPressed(0, GameKey.RadarZoom))
                 {
-                    //IVGame.ShowSubtitleMessage(Main.PlayerPed.GetHeading().ToString() + "   " + NativeCamera.GetGameCam().Rotation.Z + 180.ToString());
-                    if (!HAVE_ANIMS_LOADED("misskbtruck"))
-                        REQUEST_ANIMS("misskbtruck");
-                    else
+                    if (!IS_CHAR_GETTING_UP(Main.PlayerHandle) && !IS_CHAR_SWIMMING(Main.PlayerHandle) && !IS_CHAR_SITTING_IN_ANY_CAR(Main.PlayerHandle) && !IS_CHAR_GETTING_IN_TO_A_CAR(Main.PlayerHandle) && !IS_PED_RAGDOLL(Main.PlayerHandle) && !IS_CHAR_IN_AIR(Main.PlayerHandle) && !IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "misskbtruck", "jump_grab"))
                     {
-                        Main.PlayerPed.SetHeading(NativeCamera.GetGameCam().Rotation.Z);
-                        _TASK_PLAY_ANIM_NON_INTERRUPTABLE(Main.PlayerHandle, "jump_grab", "misskbtruck", 4.0f, 0, 1, 1, 0, -2);
-                        isTackling = true;
+                        //IVGame.ShowSubtitleMessage(Main.PlayerPed.GetHeading().ToString() + "   " + NativeCamera.GetGameCam().Rotation.Z + 180.ToString());
+                        if (!HAVE_ANIMS_LOADED("misskbtruck"))
+                            REQUEST_ANIMS("misskbtruck");
+                        else
+                        {
+                            Main.PlayerPed.SetHeading(NativeCamera.GetGameCam().Rotation.Z);
+                            _TASK_PLAY_ANIM_NON_INTERRUPTABLE(Main.PlayerHandle, "jump_grab", "misskbtruck", 4.0f, 0, 1, 1, 0, -2);
+                            REMOVE_ANIMS("misskbtruck");
+                            isTackling = true;
+                        }
                     }
                 }
             }

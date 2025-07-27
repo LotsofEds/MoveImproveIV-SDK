@@ -15,6 +15,7 @@ namespace MoveImprove.ivsdk
         // IniShit
         public static Keys ClimbDownKey;
         public static GameKey GrabKey;
+
         public static bool Alt180Turn;
         public static bool QuickTurnStop;
         public static bool SprintToVehicles;
@@ -27,6 +28,8 @@ namespace MoveImprove.ivsdk
         public static bool OldLedgeMethod;
         public static bool GrabEnable;
         public static bool FlipEnable;
+        public static bool TackleEnable;
+
         public static float CombatRollSpeed;
         public static float PickupObjectSpeed;
         public static float ClimbAndShimmySpeed;
@@ -72,9 +75,7 @@ namespace MoveImprove.ivsdk
                 TheDelayedCaller.ClearAll();
                 TheDelayedCaller = null;
             }
-            RagdollFix.pList.Clear();
-            RagdollFix.vList.Clear();
-            RagdollFix.aList.Clear();
+            RagdollFix.UnInit();
         }
 
         private void Main_Initialized(object sender, EventArgs e)
@@ -99,7 +100,6 @@ namespace MoveImprove.ivsdk
             FastAnims.Tick();
             CounterStrikes.Tick();
             //Prone.Tick();
-            if (FlipEnable)
                 FlipsNShit.Tick();
             AdvancedClimbing.Tick();
             if (FixRagdoll)
@@ -133,7 +133,8 @@ namespace MoveImprove.ivsdk
             JumpFromLedges = settings.GetBoolean("EXPERIMENTAL FEATURES", "JumpFromLedges", false);
             FixRagdoll = settings.GetBoolean("MAIN", "RagdollFix", false);
             GrabEnable = settings.GetBoolean("EXPERIMENTAL FEATURES", "GrabEnable", false);
-            FlipEnable = settings.GetBoolean("EXPERIMENTAL FEATURES", "FlipAndTackle", false);
+            FlipEnable = settings.GetBoolean("EXPERIMENTAL FEATURES", "FlipEnable", false);
+            TackleEnable = settings.GetBoolean("EXPERIMENTAL FEATURES", "TackleEnable", false);
 
             // AnimSpeeds
             CombatRollSpeed = settings.GetFloat("ANIMATION SPEED", "CombatRoll", 1.0f);
