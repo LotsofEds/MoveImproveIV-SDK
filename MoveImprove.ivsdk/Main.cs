@@ -29,6 +29,7 @@ namespace MoveImprove.ivsdk
         public static bool GrabEnable;
         public static bool FlipEnable;
         public static bool TackleEnable;
+        public static bool JumpTurnEnable;
 
         public static float CombatRollSpeed;
         public static float PickupObjectSpeed;
@@ -83,6 +84,7 @@ namespace MoveImprove.ivsdk
             LoadSettings(Settings);
             FastAnims.Init(Settings);
             RagdollFix.Init();
+            JumpTurn.Init(Settings);
             //Prone.Init();
         }
 
@@ -100,7 +102,7 @@ namespace MoveImprove.ivsdk
             FastAnims.Tick();
             CounterStrikes.Tick();
             //Prone.Tick();
-                FlipsNShit.Tick();
+            FlipsNShit.Tick();
             AdvancedClimbing.Tick();
             if (FixRagdoll)
                 RagdollFix.Tick();
@@ -112,6 +114,8 @@ namespace MoveImprove.ivsdk
                 FasterJackingScript.Tick();
             if (GrabEnable)
                 GrabAndThrow.Tick();
+            if (JumpTurnEnable)
+                JumpTurn.Tick();
         }
         /*public static float Clamp(float value, float min, float max)
         {
@@ -127,11 +131,13 @@ namespace MoveImprove.ivsdk
             FasterJacking = settings.GetBoolean("MAIN", "FasterJacking", false);
             Alt180Turn = settings.GetBoolean("MAIN", "Alt180Turn", false);
             QuickTurnStop = settings.GetBoolean("MAIN", "StopImmediately", false);
+            JumpTurnEnable = settings.GetBoolean("MAIN", "InAirControl", false);
+            FixRagdoll = settings.GetBoolean("MAIN", "RagdollFix", false);
+
             OldLedgeMethod = settings.GetBoolean("EXPERIMENTAL FEATURES", "OldJumpFromLedgeMethod", false);
             ExtremeClimbing = settings.GetBoolean("EXPERIMENTAL FEATURES", "ExtremeClimbing", false);
             ClimbDown = settings.GetBoolean("EXPERIMENTAL FEATURES", "ClimbDown", false);
             JumpFromLedges = settings.GetBoolean("EXPERIMENTAL FEATURES", "JumpFromLedges", false);
-            FixRagdoll = settings.GetBoolean("MAIN", "RagdollFix", false);
             GrabEnable = settings.GetBoolean("EXPERIMENTAL FEATURES", "GrabEnable", false);
             FlipEnable = settings.GetBoolean("EXPERIMENTAL FEATURES", "FlipEnable", false);
             TackleEnable = settings.GetBoolean("EXPERIMENTAL FEATURES", "TackleEnable", false);

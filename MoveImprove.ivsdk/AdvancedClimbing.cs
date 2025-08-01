@@ -14,14 +14,11 @@ namespace MoveImprove.ivsdk
         private static float groundDist, objDist;
         private static int ObjHandle;
         private static int LdrHandle;
-        //private static UIntPtr ObjPtr;
         private static float hdng;
         private static bool IsGrabbingLedge;
-        //private static bool DeleteObj;
         private static bool DoClimbDown;
         private static bool CanClimbDown;
         private static bool onLadder;
-        public static Vector3 ObjPos { get; set; }
         public static Dictionary<UIntPtr, int> ObjHandles { get; private set; } = new Dictionary<UIntPtr, int>();
         public static void Tick()
         {
@@ -127,7 +124,6 @@ namespace MoveImprove.ivsdk
                 }
             }
         }
-
         private static void JumpFromLedge()
         {
             if (NativeControls.IsGameKeyPressed(0, GameKey.Aim) && IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "climb_std", "climb_idle"))
