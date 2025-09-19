@@ -42,7 +42,6 @@ namespace MoveImprove.ivsdk
                     int pedHandle = ped.Value;
                     if (pList.Contains(pedHandle)) continue;
                     if (!LOCATE_CHAR_ON_FOOT_3D(pedHandle, Main.PlayerPos.X, Main.PlayerPos.Y, Main.PlayerPos.Z, 30, 30, 30, false)) continue;
-                    //myPed = NativeWorld.GetPedInstanceFromHandle(pedHandle);
                     float CounterTime = 0;
 
                     if (IS_CHAR_PLAYING_ANIM(pedHandle, "melee_counters", "hit_counter_right_2"))
@@ -116,7 +115,6 @@ namespace MoveImprove.ivsdk
 
             foreach (var vped in pList)
             {
-                //IVGame.ShowSubtitleMessage(vped.ToString() + "   " + Main.PlayerHandle.ToString());
                 if (aList[pList.IndexOf(vped)] > 0.65)
                     SWITCH_PED_TO_RAGDOLL_WITH_FALL(vped, 1000, 1000, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
@@ -129,7 +127,6 @@ namespace MoveImprove.ivsdk
 
             GET_CURRENT_CHAR_WEAPON(Main.PlayerHandle, out int pWeap);
             GET_CHAR_VELOCITY(Main.PlayerHandle, out Vector3 pVel);
-            GET_CHAR_HEIGHT_ABOVE_GROUND(Main.PlayerHandle, out float pDist);
 
             if (IS_PED_RAGDOLL(Main.PlayerHandle) && pWeap == 41)
                 stopRagdoll = true;

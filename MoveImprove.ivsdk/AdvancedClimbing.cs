@@ -26,7 +26,8 @@ namespace MoveImprove.ivsdk
             {
                 if (!DOES_OBJECT_EXIST(ObjHandle))
                 {
-                    CREATE_OBJECT(GET_HASH_KEY("cj_dart_1"), Main.PlayerPos.X, Main.PlayerPos.Y, Main.PlayerPos.Z + 10f, out ObjHandle, true);
+                    GET_OFFSET_FROM_CHAR_IN_WORLD_COORDS(Main.PlayerHandle, 0f, 0.2f, 0f, out float pOffX, out float pOffY, out float pOffZ);
+                    CREATE_OBJECT(GET_HASH_KEY("cj_dart_1"), pOffX, pOffY, pOffZ, out ObjHandle, true);
                     ATTACH_OBJECT_TO_PED(ObjHandle, Main.PlayerHandle, (uint)eBone.BONE_ROOT, 0.0f, 0.2f, 0.0f, 0f, 0f, 0f, 0);
                     SET_OBJECT_VISIBLE(ObjHandle, false);
                     DoClimbDown = true;
@@ -34,19 +35,14 @@ namespace MoveImprove.ivsdk
             }
             if (DoClimbDown)
             {
-                DoClimbDown = false;
-                if (!DOES_OBJECT_EXIST(ObjHandle))
-                    return;
-
                 GET_OBJECT_COORDINATES(ObjHandle, out float objX, out float objY, out float objZ);
                 GET_GROUND_Z_FOR_3D_COORD(objX, objY, objZ, out groundDist);
                 GET_DISTANCE_BETWEEN_COORDS_3D(objX, objY, objZ, objX, objY, groundDist, out objDist);
-                if (DOES_OBJECT_EXIST(ObjHandle) && objDist > 3.25f)
+
+                DETACH_OBJECT(ObjHandle, true);
+                if (objDist > 3.25f)
                 {
                     CanClimbDown = true;
-                    Main.TheDelayedCaller.Add(TimeSpan.FromMilliseconds(20), "Main", () =>
-                    {
-                        DETACH_OBJECT(ObjHandle, true);
 
                     Main.TheDelayedCaller.Add(TimeSpan.FromMilliseconds(450), "Main", () =>
                     {
@@ -73,8 +69,8 @@ namespace MoveImprove.ivsdk
                         else
                             CanClimbDown = false;
                     });
-                    });
                 }
+                DoClimbDown = false;
             }
             if (onLadder)
             {
@@ -83,6 +79,7 @@ namespace MoveImprove.ivsdk
                     DELETE_OBJECT(ref LdrHandle);
                     _TASK_JUMP(Main.PlayerHandle, true);
                     DoClimbDown = false;
+                    CanClimbDown = false;
                     onLadder = false;
                 }
             }
