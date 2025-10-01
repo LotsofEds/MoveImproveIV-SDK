@@ -105,9 +105,8 @@ namespace MoveImprove.ivsdk
                     });
                 }
                 else if (NativeControls.IsGameKeyPressed(0, GameKey.Aim) && IsGrabbingLedge)
-                {
                     JumpFromLedge();
-                }
+
                 else if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && IsGrabbingLedge && (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "climb_std", "climb_idle")))
                 {
                     IsGrabbingLedge = false;

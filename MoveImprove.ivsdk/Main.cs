@@ -30,6 +30,7 @@ namespace MoveImprove.ivsdk
         public static bool FlipEnable;
         public static bool TackleEnable;
         public static bool JumpTurnEnable;
+        public static bool GetUpCrouch;
 
         public static float CombatRollSpeed;
         public static float PickupObjectSpeed;
@@ -116,6 +117,8 @@ namespace MoveImprove.ivsdk
                 GrabAndThrow.Tick();
             if (JumpTurnEnable)
                 JumpTurn.Tick();
+            if (GetUpCrouch)
+                GetUpCrouched.Tick();
         }
         /*public static float Clamp(float value, float min, float max)
         {
@@ -133,6 +136,7 @@ namespace MoveImprove.ivsdk
             QuickTurnStop = settings.GetBoolean("MAIN", "StopImmediately", false);
             JumpTurnEnable = settings.GetBoolean("MAIN", "InAirControl", false);
             FixRagdoll = settings.GetBoolean("MAIN", "RagdollFix", false);
+            GetUpCrouch = settings.GetBoolean("MAIN", "GetUpCrouch", false);
 
             OldLedgeMethod = settings.GetBoolean("EXPERIMENTAL FEATURES", "OldJumpFromLedgeMethod", false);
             ExtremeClimbing = settings.GetBoolean("EXPERIMENTAL FEATURES", "ExtremeClimbing", false);

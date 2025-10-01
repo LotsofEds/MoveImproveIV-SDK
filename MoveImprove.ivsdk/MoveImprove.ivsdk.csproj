@@ -58,6 +58,7 @@
     <Compile Include="FastAnims.cs" />
     <Compile Include="FasterJackingScript.cs" />
     <Compile Include="ForceRunning.cs" />
+    <Compile Include="GetUpCrouched.cs" />
     <Compile Include="GrabAndThrow.cs" />
     <Compile Include="JumpTurn.cs" />
     <Compile Include="Main.cs" />

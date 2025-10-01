@@ -1,5 +1,4 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Windows.Forms;
 using static IVSDKDotNet.Native.Natives;
 using CCL.GTAIV;
@@ -106,9 +105,9 @@ namespace MoveImprove.ivsdk
                 {
                     if (!DOES_CHAR_EXIST(pList[i]) || IS_CHAR_DEAD(pList[i]) || IS_PED_RAGDOLL(pList[i]))
                     {
-                        pList.RemoveAt(i);
                         vList.RemoveAt(i);
                         aList.RemoveAt(i);
+                        pList.RemoveAt(i);
                     }
                 }
             }
