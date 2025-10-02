@@ -20,7 +20,7 @@ namespace MoveImprove.ivsdk
             foreach (var ped in PedHelper.PedHandles)
             {
                 int pedHandle = ped.Value;
-                if (IS_CHAR_GETTING_UP(pedHandle) && !IS_PED_RAGDOLL(pedHandle))
+                if (IS_CHAR_GETTING_UP(pedHandle) && !IS_PED_RAGDOLL(pedHandle) && (pedHandle != Main.PlayerHandle || IS_CHAR_DUCKING(pedHandle)))
                 {
                     if (IS_CHAR_PLAYING_ANIM(pedHandle, "get_up", "get_up_fast"))
                         TriggerDucking(pedHandle, "get_up", "get_up_fast", 0.4f);

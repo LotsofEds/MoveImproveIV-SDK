@@ -16,10 +16,7 @@ namespace MoveImprove.ivsdk
         public static Keys ClimbDownKey;
         public static GameKey GrabKey;
 
-        public static bool Alt180Turn;
-        public static bool QuickTurnStop;
-        public static bool SprintToVehicles;
-        public static bool ForceRun;
+        public static bool Improve180Turn;
         public static bool ExtremeClimbing;
         public static bool ClimbDown;
         public static bool JumpFromLedges;
@@ -31,6 +28,8 @@ namespace MoveImprove.ivsdk
         public static bool TackleEnable;
         public static bool JumpTurnEnable;
         public static bool GetUpCrouch;
+        public static bool TightTurn;
+        public static bool ReworkRun;
 
         public static float CombatRollSpeed;
         public static float PickupObjectSpeed;
@@ -83,9 +82,14 @@ namespace MoveImprove.ivsdk
         private void Main_Initialized(object sender, EventArgs e)
         {
             LoadSettings(Settings);
+            if (ReworkRun)
+                RunRework.Init(Settings);
+            if (Improve180Turn)
+                Alt180TurnScript.Init(Settings);
             FastAnims.Init(Settings);
             RagdollFix.Init();
             JumpTurn.Init(Settings);
+            TurnHelp.Init(Settings);
             //Prone.Init();
         }
 
@@ -107,10 +111,10 @@ namespace MoveImprove.ivsdk
             AdvancedClimbing.Tick();
             if (FixRagdoll)
                 RagdollFix.Tick();
-            if (Alt180Turn)
+            if (Improve180Turn)
                 Alt180TurnScript.Tick();
-            if (SprintToVehicles || ForceRun)
-                ForceRunning.Tick();
+            if (ReworkRun)
+                RunRework.Tick();
             if (FasterJacking)
                 FasterJackingScript.Tick();
             if (GrabEnable)
@@ -119,24 +123,26 @@ namespace MoveImprove.ivsdk
                 JumpTurn.Tick();
             if (GetUpCrouch)
                 GetUpCrouched.Tick();
+            if (TightTurn)
+                TurnHelp.Tick();
         }
-        /*public static float Clamp(float value, float min, float max)
+        // Credits to catsmackaroo
+        public static float Clamp(float value, float min, float max)
         {
             if (value < min) return min;
             if (value > max) return max;
             return value;
-        }*/
+        }
         private void LoadSettings(SettingsFile settings)
         {
             // Booleans
-            SprintToVehicles = settings.GetBoolean("MAIN", "SprintToVehicles", false);
-            ForceRun = settings.GetBoolean("MAIN", "ForceRun", false);
+            ReworkRun = settings.GetBoolean("STAMINA REWORK", "Enable", false);
+            Improve180Turn = settings.GetBoolean("IMPROVE 180 TURN", "Enable", false);
             FasterJacking = settings.GetBoolean("MAIN", "FasterJacking", false);
-            Alt180Turn = settings.GetBoolean("MAIN", "Alt180Turn", false);
-            QuickTurnStop = settings.GetBoolean("MAIN", "StopImmediately", false);
             JumpTurnEnable = settings.GetBoolean("MAIN", "InAirControl", false);
             FixRagdoll = settings.GetBoolean("MAIN", "RagdollFix", false);
             GetUpCrouch = settings.GetBoolean("MAIN", "GetUpCrouch", false);
+            TightTurn = settings.GetBoolean("MAIN", "TighterTurns", false);
 
             OldLedgeMethod = settings.GetBoolean("EXPERIMENTAL FEATURES", "OldJumpFromLedgeMethod", false);
             ExtremeClimbing = settings.GetBoolean("EXPERIMENTAL FEATURES", "ExtremeClimbing", false);

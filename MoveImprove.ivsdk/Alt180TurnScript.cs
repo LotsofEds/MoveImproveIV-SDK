@@ -11,12 +11,12 @@ namespace MoveImprove.ivsdk
     internal class Alt180TurnScript
     {
         private static float turnpntr;
-        private static string moveSet = "";
-        private static string moveAnim = "";
 
+        private static bool QuickTurnStop;
+        private static bool Remove180Anim;
         private static void StopUnarmed()
         {
-            if (Main.QuickTurnStop)
+            if (QuickTurnStop)
             {
                 _TASK_PLAY_ANIM_NON_INTERRUPTABLE(Main.PlayerHandle, "idle", "move_player", 5.00f, 0, 1, 0, 0, -1);
                 Main.TheDelayedCaller.Add(TimeSpan.FromMilliseconds(200), "Main", () =>
@@ -31,9 +31,9 @@ namespace MoveImprove.ivsdk
             else
                 BLEND_OUT_CHAR_MOVE_ANIMS(Main.PlayerHandle);
         }
-        private static void StopArmed()
+        private static void StopArmed(string moveSet, string moveAnim)
         {
-            if (Main.QuickTurnStop)
+            if (QuickTurnStop)
             {
                 _TASK_PLAY_ANIM_NON_INTERRUPTABLE(Main.PlayerHandle, "idle", moveSet, 5.00f, 0, 1, 0, 0, -1);
                 Main.TheDelayedCaller.Add(TimeSpan.FromMilliseconds(200), "Main", () =>
@@ -52,9 +52,18 @@ namespace MoveImprove.ivsdk
             else
                 StopUnarmed();
         }
+        private static void StopAnims(string moveSet, string moveAnim)
+        {
+            SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, moveSet, moveAnim, 1.0f);
+            BLEND_OUT_CHAR_MOVE_ANIMS(Main.PlayerHandle);
+        }
+        public static void Init(SettingsFile settings)
+        {
+            QuickTurnStop = settings.GetBoolean("IMPROVE 180 TURN", "StopImmediately", false);
+            Remove180Anim = settings.GetBoolean("IMPROVE 180 TURN", "Remove180Anim", false);
+        }
         public static void Tick()
         {
-            REQUEST_ANIMS("move_player");
             if (NativeControls.IsGameKeyPressed(0, GameKey.Sprint) && (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_player", "walk_turn_180_l") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_player", "walk_turn_180_r")))
             {
                 SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "move_player", "walk_turn_180_l", 1.5f);
@@ -62,214 +71,266 @@ namespace MoveImprove.ivsdk
             }
             else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_player", "sprint_turn_180_r"))
             {
-                GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_player", "sprint_turn_180_r", out turnpntr);
-                if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
-                    StopUnarmed();
-
-                if (turnpntr > 0.5 && turnpntr < 0.7)
+                if (Remove180Anim)
+                    StopAnims("move_player", "sprint_turn_180_r");
+                else
                 {
-                    SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_player", "sprint_turn_180_r", 0.87f);
+                    GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_player", "sprint_turn_180_r", out turnpntr);
                     if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
                         StopUnarmed();
+
+                    if (turnpntr > 0.5 && turnpntr < 0.7)
+                    {
+                        SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_player", "sprint_turn_180_r", 0.87f);
+                        if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
+                            StopUnarmed();
+                    }
                 }
             }
             else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_player", "sprint_turn_180_l"))
             {
-                GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_player", "sprint_turn_180_l", out turnpntr);
-                if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
-                    StopUnarmed();
-
-                if (turnpntr > 0.57 && turnpntr < 0.7)
+                if (Remove180Anim)
+                    StopAnims("move_player", "sprint_turn_180_l");
+                else
                 {
-                    SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_player", "sprint_turn_180_l", 0.84f);
+                    GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_player", "sprint_turn_180_l", out turnpntr);
                     if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
                         StopUnarmed();
+
+                    if (turnpntr > 0.57 && turnpntr < 0.7)
+                    {
+                        SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_player", "sprint_turn_180_l", 0.84f);
+                        if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
+                            StopUnarmed();
+                    }
                 }
             }
 
             else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_player", "run_turn_180_r"))
             {
-                GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_player", "run_turn_180_r", out turnpntr);
-                if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
-                    StopUnarmed();
-
-                if (turnpntr > 0.5 && turnpntr < 0.7)
+                if (Remove180Anim)
+                    StopAnims("move_player", "run_turn_180_r");
+                else
                 {
-                    SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_player", "run_turn_180_r", 0.87f);
+                    GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_player", "run_turn_180_r", out turnpntr);
                     if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
                         StopUnarmed();
+
+                    if (turnpntr > 0.5 && turnpntr < 0.7)
+                    {
+                        SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_player", "run_turn_180_r", 0.87f);
+                        if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
+                            StopUnarmed();
+                    }
                 }
             }
 
             else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_player", "run_turn_180_l"))
             {
-                GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_player", "run_turn_180_l", out turnpntr);
-                if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
-                    StopUnarmed();
-
-                if (turnpntr > 0.57 && turnpntr < 0.7)
+                if (Remove180Anim)
+                    StopAnims("move_player", "run_turn_180_l");
+                else
                 {
-                    SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_player", "run_turn_180_l", 0.84f);
+                    GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_player", "run_turn_180_l", out turnpntr);
                     if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
                         StopUnarmed();
+
+                    if (turnpntr > 0.57 && turnpntr < 0.7)
+                    {
+                        SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_player", "run_turn_180_l", 0.84f);
+                        if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
+                            StopUnarmed();
+                    }
                 }
             }
 
             else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_player", "run_turn_180"))
             {
-                GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_player", "run_turn_180", out turnpntr);
-                if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
-                    StopUnarmed();
-
-                if (turnpntr > 0.65 && turnpntr < 0.7)
+                if (Remove180Anim)
+                    StopAnims("move_player", "run_turn_180");
+                else
                 {
-                    SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_player", "run_turn_180", 0.84f);
+                    GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_player", "run_turn_180", out turnpntr);
                     if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
                         StopUnarmed();
+
+                    if (turnpntr > 0.65 && turnpntr < 0.7)
+                    {
+                        SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_player", "run_turn_180", 0.84f);
+                        if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
+                            StopUnarmed();
+                    }
                 }
             }
 
             else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_rifle", "sprint_turn_180_r"))
             {
-                moveSet = "move_rifle";
-                moveAnim = "sprint_turn_180_r";
-                GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_rifle", "sprint_turn_180_r", out turnpntr);
-                if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
-                    StopArmed();
-
-                if (turnpntr > 0.5 && turnpntr < 0.7)
+                if (Remove180Anim)
+                    StopAnims("move_rifle", "sprint_turn_180_r");
+                else
                 {
-                    SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_rifle", "sprint_turn_180_r", 0.87f);
+                    GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_rifle", "sprint_turn_180_r", out turnpntr);
                     if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
-                        StopArmed();
+                        StopArmed("move_rifle", "sprint_turn_180_r");
+
+                    if (turnpntr > 0.5 && turnpntr < 0.7)
+                    {
+                        SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_rifle", "sprint_turn_180_r", 0.87f);
+                        if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
+                            StopArmed("move_rifle", "sprint_turn_180_r");
+                    }
                 }
             }
 
             else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_rifle", "sprint_turn_180_l"))
             {
-                moveSet = "move_rifle";
-                moveAnim = "sprint_turn_180_l";
-                GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_rifle", "sprint_turn_180_l", out turnpntr);
-                if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
-                    StopArmed();
-
-                if (turnpntr > 0.57 && turnpntr < 0.7)
+                if (Remove180Anim)
+                    StopAnims("move_rifle", "sprint_turn_180_l");
+                else
                 {
-                    SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_rifle", "sprint_turn_180_l", 0.84f);
+                    GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_rifle", "sprint_turn_180_l", out turnpntr);
                     if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
-                        StopArmed();
+                        StopArmed("move_rifle", "sprint_turn_180_l");
+
+                    if (turnpntr > 0.57 && turnpntr < 0.7)
+                    {
+                        SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_rifle", "sprint_turn_180_l", 0.84f);
+                        if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
+                            StopArmed("move_rifle", "sprint_turn_180_l");
+                    }
                 }
             }
 
             else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_rifle", "run_turn_180_r"))
             {
-                moveSet = "move_rifle";
-                moveAnim = "run_turn_180_r";
-                GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_rifle", "run_turn_180_r", out turnpntr);
-                if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
-                    StopArmed();
-
-                if (turnpntr > 0.5 && turnpntr < 0.7)
+                if (Remove180Anim)
+                    StopAnims("move_rifle", "run_turn_180_r");
+                else
                 {
-                    SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_rifle", "run_turn_180_r", 0.87f);
+                    GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_rifle", "run_turn_180_r", out turnpntr);
                     if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
-                        StopArmed();
+                        StopArmed("move_rifle", "run_turn_180_r");
+
+                    if (turnpntr > 0.5 && turnpntr < 0.7)
+                    {
+                        SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_rifle", "run_turn_180_r", 0.87f);
+                        if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
+                            StopArmed("move_rifle", "run_turn_180_r");
+                    }
                 }
             }
 
             else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_rifle", "run_turn_180_l"))
             {
-                moveSet = "move_rifle";
-                moveAnim = "run_turn_180_l";
-                GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_rifle", "run_turn_180_l", out turnpntr);
-                if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
-                    StopArmed();
-
-                if (turnpntr > 0.57 && turnpntr < 0.7)
+                if (Remove180Anim)
+                    StopAnims("move_rifle", "run_turn_180_l");
+                else
                 {
-                    SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_rifle", "run_turn_180_l", 0.84f);
+                    GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_rifle", "run_turn_180_l", out turnpntr);
                     if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
-                        StopArmed();
+                        StopArmed("move_rifle", "run_turn_180_l");
+
+                    if (turnpntr > 0.57 && turnpntr < 0.7)
+                    {
+                        SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_rifle", "run_turn_180_l", 0.84f);
+                        if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
+                            StopArmed("move_rifle", "run_turn_180_l");
+                    }
                 }
             }
 
             else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_rifle", "run_turn_180"))
             {
-                moveSet = "move_rifle";
-                moveAnim = "run_turn_180";
-                GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_rifle", "run_turn_180", out turnpntr);
-                if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
-                    StopArmed();
-
-                if (turnpntr > 0.65 && turnpntr < 0.7)
+                if (Remove180Anim)
+                    StopAnims("move_rifle", "run_turn_180");
+                else
                 {
-                    SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_rifle", "run_turn_180", 0.84f);
+                    GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_rifle", "run_turn_180", out turnpntr);
                     if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
-                        StopArmed();
+                        StopArmed("move_rifle", "run_turn_180");
+
+                    if (turnpntr > 0.65 && turnpntr < 0.7)
+                    {
+                        SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_rifle", "run_turn_180", 0.84f);
+                        if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
+                            StopArmed("move_rifle", "run_turn_180");
+                    }
                 }
             }
 
             else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_rpg", "sprint_turn_180_r"))
             {
-                moveSet = "move_rpg";
-                moveAnim = "sprint_turn_180_r";
-                GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_rpg", "sprint_turn_180_r", out turnpntr);
-                if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
-                    StopArmed();
-
-                if (turnpntr > 0.5 && turnpntr < 0.7)
+                if (Remove180Anim)
+                    StopAnims("move_rpg", "sprint_turn_180_r");
+                else
                 {
-                    SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_rpg", "sprint_turn_180_r", 0.87f);
+                    GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_rpg", "sprint_turn_180_r", out turnpntr);
                     if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
-                        StopArmed();
+                        StopArmed("move_rpg", "sprint_turn_180_r");
+
+                    if (turnpntr > 0.5 && turnpntr < 0.7)
+                    {
+                        SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_rpg", "sprint_turn_180_r", 0.87f);
+                        if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
+                            StopArmed("move_rpg", "sprint_turn_180_r");
+                    }
                 }
             }
 
             else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_rpg", "sprint_turn_180_l"))
             {
-                moveSet = "move_rpg";
-                moveAnim = "sprint_turn_180_l";
-                GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_rpg", "sprint_turn_180_l", out turnpntr);
-                if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
-                    StopArmed();
-
-                if (turnpntr > 0.57 && turnpntr < 0.7)
+                if (Remove180Anim)
+                    StopAnims("move_rpg", "sprint_turn_180_l");
+                else
                 {
-                    SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_rpg", "sprint_turn_180_l", 0.84f);
+                    GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_rpg", "sprint_turn_180_l", out turnpntr);
                     if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
-                        StopArmed();
+                        StopArmed("move_rpg", "sprint_turn_180_l");
+
+                    if (turnpntr > 0.57 && turnpntr < 0.7)
+                    {
+                        SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_rpg", "sprint_turn_180_l", 0.84f);
+                        if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
+                            StopArmed("move_rpg", "sprint_turn_180_l");
+                    }
                 }
             }
 
             else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_rpg", "run_turn_180_r"))
             {
-                moveSet = "move_rpg";
-                moveAnim = "run_turn_180_r";
-                GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_rpg", "run_turn_180_r", out turnpntr);
-                if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
-                    StopArmed();
-
-                if (turnpntr > 0.5 && turnpntr < 0.7)
+                if (Remove180Anim)
+                    StopAnims("move_rpg", "run_turn_180_r");
+                else
                 {
-                    SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_rpg", "run_turn_180_r", 0.87f);
+                    GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_rpg", "run_turn_180_r", out turnpntr);
                     if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
-                        StopArmed();
+                        StopArmed("move_rpg", "run_turn_180_r");
+
+                    if (turnpntr > 0.5 && turnpntr < 0.7)
+                    {
+                        SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_rpg", "run_turn_180_r", 0.87f);
+                        if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
+                            StopArmed("move_rpg", "run_turn_180_r");
+                    }
                 }
             }
 
             else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_rpg", "run_turn_180_l"))
             {
-                moveSet = "move_rpg";
-                moveAnim = "run_turn_180_l";
-                GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_rpg", "run_turn_180_l", out turnpntr);
-                if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
-                    StopArmed();
-
-                if (turnpntr > 0.57 && turnpntr < 0.7)
+                if (Remove180Anim)
+                    StopAnims("move_rpg", "run_turn_180_l");
+                else
                 {
-                    SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_rpg", "run_turn_180_l", 0.84f);
+                    GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_rpg", "run_turn_180_l", out turnpntr);
                     if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
-                        StopArmed();
+                        StopArmed("move_rpg", "run_turn_180_l");
+
+                    if (turnpntr > 0.57 && turnpntr < 0.7)
+                    {
+                        SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_rpg", "run_turn_180_l", 0.84f);
+                        if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
+                            StopArmed("move_rpg", "run_turn_180_l");
+                    }
                 }
             }
         }

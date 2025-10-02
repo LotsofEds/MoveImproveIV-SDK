@@ -14,7 +14,7 @@ namespace MoveImprove.ivsdk
         private static float turnAmount;
         public static void Init(SettingsFile settings)
         {
-            turnAmount = settings.GetFloat("MAIN", "TurnAmount", 0);
+            turnAmount = settings.GetFloat("MAIN", "JumpTurnAmount", 0);
         }
         public static void Tick()
         {
