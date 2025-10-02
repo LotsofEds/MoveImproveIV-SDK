@@ -29,7 +29,9 @@ namespace MoveImprove.ivsdk
         public static bool JumpTurnEnable;
         public static bool GetUpCrouch;
         public static bool TightTurn;
-        public static bool ReworkRun;
+        public static bool SprintToVehicles;
+        public static bool ForceRun;
+        public static bool ToggleSprint;
 
         public static float CombatRollSpeed;
         public static float PickupObjectSpeed;
@@ -82,7 +84,7 @@ namespace MoveImprove.ivsdk
         private void Main_Initialized(object sender, EventArgs e)
         {
             LoadSettings(Settings);
-            if (ReworkRun)
+            if (ForceRun)
                 RunRework.Init(Settings);
             if (Improve180Turn)
                 Alt180TurnScript.Init(Settings);
@@ -113,7 +115,6 @@ namespace MoveImprove.ivsdk
                 RagdollFix.Tick();
             if (Improve180Turn)
                 Alt180TurnScript.Tick();
-            if (ReworkRun)
                 RunRework.Tick();
             if (FasterJacking)
                 FasterJackingScript.Tick();
@@ -133,11 +134,38 @@ namespace MoveImprove.ivsdk
             if (value > max) return max;
             return value;
         }
+        public static bool IsAimKeyPressedOnController()
+        {
+            uint standard = 0;
+            var settings = IVMenuManager.GetSetting(IVSDKDotNet.Enums.eSettings.SETTING_CONFIGURATION);
+            ControllerButton button;
+
+            if (settings == standard
+                && !IS_CHAR_IN_ANY_CAR(Main.PlayerPed.GetHandle()))
+                button = ControllerButton.BUTTON_TRIGGER_LEFT;
+            else
+                button = ControllerButton.BUTTON_BUMPER_LEFT;
+
+
+            if (NativeControls.IsControllerButtonPressed(2, button))
+                return true;
+
+            return false;
+        }
+        public static bool IsPressingAimButton()
+        {
+            if ((IsAimKeyPressedOnController() && IS_USING_CONTROLLER()) || NativeControls.IsGameKeyPressed(0, GameKey.Aim) || NativeControls.IsGameKeyPressed(2, GameKey.Aim))
+                return true;
+            else
+                return false;
+        }
         private void LoadSettings(SettingsFile settings)
         {
             // Booleans
-            ReworkRun = settings.GetBoolean("STAMINA REWORK", "Enable", false);
-            Improve180Turn = settings.GetBoolean("IMPROVE 180 TURN", "Enable", false);
+            SprintToVehicles = settings.GetBoolean("MAIN", "SprintToVehicles", false);
+            ForceRun = settings.GetBoolean("MAIN", "ForceRun", false);
+            ToggleSprint = settings.GetBoolean("MAIN", "ToggleSprint", false);
+            Improve180Turn = settings.GetBoolean("MAIN", "Improve180Turn", false);
             FasterJacking = settings.GetBoolean("MAIN", "FasterJacking", false);
             JumpTurnEnable = settings.GetBoolean("MAIN", "InAirControl", false);
             FixRagdoll = settings.GetBoolean("MAIN", "RagdollFix", false);

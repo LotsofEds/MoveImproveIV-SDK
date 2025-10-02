@@ -59,8 +59,8 @@ namespace MoveImprove.ivsdk
         }
         public static void Init(SettingsFile settings)
         {
-            QuickTurnStop = settings.GetBoolean("IMPROVE 180 TURN", "StopImmediately", false);
-            Remove180Anim = settings.GetBoolean("IMPROVE 180 TURN", "Remove180Anim", false);
+            QuickTurnStop = settings.GetBoolean("MAIN", "StopImmediately", false);
+            Remove180Anim = settings.GetBoolean("MAIN", "Remove180Anim", false);
         }
         public static void Tick()
         {
