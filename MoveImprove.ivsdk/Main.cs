@@ -91,6 +91,7 @@ namespace MoveImprove.ivsdk
             FastAnims.Init(Settings);
             RagdollFix.Init();
             JumpTurn.Init(Settings);
+            CounterStrikes.Init(Settings);
             TurnHelp.Init(Settings);
             //Prone.Init();
         }

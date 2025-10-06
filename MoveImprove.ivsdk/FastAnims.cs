@@ -257,18 +257,22 @@ namespace MoveImprove.ivsdk
                     SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "climb_std", "fall_land", 2.0f);
             }
 
-            if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "jump_std", "jump_on_spot"))
+            else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "jump_std", "jump_on_spot"))
             {
                 GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "jump_std", "jump_on_spot", out movepntr);
                 if (movepntr > 0.5)
                     SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "jump_std", "jump_on_spot", 2.0f);
+                else
+                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "jump_std", "jump_on_spot", 1.0f);
             }
 
-            if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "jump_rifle", "jump_on_spot"))
+            else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "jump_rifle", "jump_on_spot"))
             {
                 GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "jump_rifle", "jump_on_spot", out movepntr);
                 if (movepntr > 0.6)
                     SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "jump_rifle", "jump_on_spot", 2.0f);
+                else
+                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "jump_rifle", "jump_on_spot", 1.0f);
             }
         }
     }
