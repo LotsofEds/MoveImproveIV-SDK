@@ -32,6 +32,7 @@ namespace MoveImprove.ivsdk
         public static bool SprintToVehicles;
         public static bool ForceRun;
         public static bool ToggleSprint;
+        public static bool StaminaDrain;
 
         public static float CombatRollSpeed;
         public static float PickupObjectSpeed;
@@ -44,12 +45,18 @@ namespace MoveImprove.ivsdk
         public static float HolsterSpeed;
         public static int NumOfWeapIDs;
 
+        public static float SprintDrain;
+        public static float RunDrain;
+        public static float WalkDrain;
+
         // OtherShit
         public static DelayedCalling TheDelayedCaller;
         public static IVPed PlayerPed { get; set; }
         public static uint PlayerIndex { get; set; }
         public static int PlayerHandle { get; set; }
         public static Vector3 PlayerPos { get; set; }
+
+        public static float frameTime;
         public Main()
         {
             Uninitialize += Main_Uninitialize;
@@ -84,8 +91,6 @@ namespace MoveImprove.ivsdk
         private void Main_Initialized(object sender, EventArgs e)
         {
             LoadSettings(Settings);
-            if (ForceRun)
-                RunRework.Init(Settings);
             if (Improve180Turn)
                 Alt180TurnScript.Init(Settings);
             FastAnims.Init(Settings);
@@ -104,6 +109,7 @@ namespace MoveImprove.ivsdk
             PlayerPos = PlayerPed.Matrix.Pos;
 
             GET_CURRENT_CHAR_WEAPON(PlayerHandle, out int pWeap);
+            GET_FRAME_TIME(out frameTime);
 
             TheDelayedCaller.Process();
             PedHelper.GrabAllPeds();
@@ -127,6 +133,7 @@ namespace MoveImprove.ivsdk
                 GetUpCrouched.Tick();
             if (TightTurn)
                 TurnHelp.Tick();
+            //Pills.Tick();
         }
         // Credits to catsmackaroo
         public static float Clamp(float value, float min, float max)
@@ -172,6 +179,7 @@ namespace MoveImprove.ivsdk
             FixRagdoll = settings.GetBoolean("MAIN", "RagdollFix", false);
             GetUpCrouch = settings.GetBoolean("MAIN", "GetUpCrouch", false);
             TightTurn = settings.GetBoolean("MAIN", "TighterTurns", false);
+            StaminaDrain = settings.GetBoolean("MAIN", "ExtraStaminaDrain", false);
 
             OldLedgeMethod = settings.GetBoolean("EXPERIMENTAL FEATURES", "OldJumpFromLedgeMethod", false);
             ExtremeClimbing = settings.GetBoolean("EXPERIMENTAL FEATURES", "ExtremeClimbing", false);
@@ -196,6 +204,10 @@ namespace MoveImprove.ivsdk
             ClimbDownKey = settings.GetKey("EXPERIMENTAL FEATURES", "ClimbDownKey", Keys.J);
             GrabKey = (GameKey)settings.GetInteger("EXPERIMENTAL FEATURES", "GrabKey", 23);
             NumOfWeapIDs = settings.GetInteger("MAIN", "NumOfWeaponIDs", 60);
+
+            SprintDrain = settings.GetFloat("EXTENSIVE SETTINGS", "SprintDrain", 25.0f);
+            RunDrain = settings.GetFloat("EXTENSIVE SETTINGS", "RunDrain", 7.5f);
+            WalkDrain = settings.GetFloat("EXTENSIVE SETTINGS", "WalkDrain", 25.0f);
         }
     }
 }

@@ -11,7 +11,6 @@ namespace MoveImprove.ivsdk
 {
     internal class TurnHelp
     {
-        private static float frameTime;
         private static float turnAmount;
         private static float hdngMin;
         private static float hdngMax;
@@ -24,7 +23,6 @@ namespace MoveImprove.ivsdk
         {
             if (IS_PLAYER_CONTROL_ON((int)Main.PlayerIndex))
             {
-                GET_FRAME_TIME(out frameTime);
                 NativeCamera cam = NativeCamera.GetGameCam();
                 Vector3 dir = cam.Direction;
                 GET_HEADING_FROM_VECTOR_2D(dir.X, dir.Y, out float camHdng);
@@ -42,9 +40,9 @@ namespace MoveImprove.ivsdk
                 //IVGame.ShowSubtitleMessage(pHdng.ToString() + "  " + camHdng.ToString() + "  " + hdngMin.ToString() + "  " + hdngMax.ToString());
 
                 if (isTurningLeft() && !(pHdng > hdngMin && pHdng < hdngMax))
-                    SET_CHAR_HEADING(Main.PlayerHandle, pHdng + turnAmount * frameTime);
+                    SET_CHAR_HEADING(Main.PlayerHandle, pHdng + turnAmount * Main.frameTime);
                 if (isTurningRight() && !(pHdng > hdngMin && pHdng < hdngMax))
-                    SET_CHAR_HEADING(Main.PlayerHandle, pHdng - turnAmount * frameTime);
+                    SET_CHAR_HEADING(Main.PlayerHandle, pHdng - turnAmount * Main.frameTime);
             }
         }
         private static bool isTurningLeft()

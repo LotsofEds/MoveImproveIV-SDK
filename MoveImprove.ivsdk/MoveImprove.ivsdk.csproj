@@ -57,6 +57,7 @@
     <Compile Include="DelayedCaller.cs" />
     <Compile Include="FastAnims.cs" />
     <Compile Include="FasterJackingScript.cs" />
+    <Compile Include="Pills.cs" />
     <Compile Include="RunRework.cs" />
     <Compile Include="GetUpCrouched.cs" />
     <Compile Include="GrabAndThrow.cs" />

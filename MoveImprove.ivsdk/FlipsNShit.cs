@@ -97,12 +97,14 @@ namespace MoveImprove.ivsdk
                     Main.PlayerPed.ApplyForceRelative(new Vector3(0, -0.5f * pSpeed, 6.9f), new Vector3(0));
                     _TASK_PLAY_ANIM_WITH_FLAGS(Main.PlayerHandle, "jump_land_roll", "jump_std", 8.0f, -1, (int)AnimationFlags.RemoveSound | (int)AnimationFlags.StayAtNewPosition);
 
-                    Main.TheDelayedCaller.Add(TimeSpan.FromMilliseconds(700), "Main", () =>
+                    Main.TheDelayedCaller.Add(TimeSpan.FromMilliseconds(650), "Main", () =>
                     {
-                        _TASK_PLAY_ANIM_NON_INTERRUPTABLE(Main.PlayerHandle, "idle", "move_player", 8.0f, 0, 1, 0, 0, -1);
-                        Main.TheDelayedCaller.Add(TimeSpan.FromMilliseconds(250), "Main", () =>
+                        _TASK_PLAY_ANIM_NON_INTERRUPTABLE(Main.PlayerHandle, "recover_balance", "ragdoll_trans", 4, 0, 0, 0, 0, -1);
+                        //_TASK_PLAY_ANIM(Main.PlayerHandle, "idle", "move_player", 8.0f, 0, 1, 0, 0, -1);
+                        Main.TheDelayedCaller.Add(TimeSpan.FromMilliseconds(200), "Main", () =>
                         {
-                            SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_player", "idle", 1.0f);
+                            SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "ragdoll_trans", "recover_balance", 1.0f);
+                            //SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_player", "idle", 1.0f);
                         });
                         isFlipping = false;
                     });
@@ -129,12 +131,14 @@ namespace MoveImprove.ivsdk
                     //APPLY_FORCE_TO_PED(Main.PlayerHandle, 0, 0, 0, 6.25f, 0, 0, 0, 0, 1, 1, 1);
                     _TASK_PLAY_ANIM_WITH_FLAGS(Main.PlayerHandle, "jump_land_roll", "jump_std", 4.0f, -1, (int)AnimationFlags.RemoveSound | (int)AnimationFlags.StayAtNewPosition);
 
-                    Main.TheDelayedCaller.Add(TimeSpan.FromMilliseconds(700), "Main", () =>
+                    Main.TheDelayedCaller.Add(TimeSpan.FromMilliseconds(650), "Main", () =>
                     {
-                        _TASK_PLAY_ANIM_NON_INTERRUPTABLE(Main.PlayerHandle, "idle", "move_player", 8.0f, 0, 1, 0, 0, -1);
-                        Main.TheDelayedCaller.Add(TimeSpan.FromMilliseconds(250), "Main", () =>
+                        _TASK_PLAY_ANIM_NON_INTERRUPTABLE(Main.PlayerHandle, "recover_balance", "ragdoll_trans", 4, 0, 0, 0, 0, -1);
+                        //_TASK_PLAY_ANIM(Main.PlayerHandle, "idle", "move_player", 8.0f, 0, 1, 0, 0, -1);
+                        Main.TheDelayedCaller.Add(TimeSpan.FromMilliseconds(200), "Main", () =>
                         {
-                            SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_player", "idle", 1.0f);
+                            SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "ragdoll_trans", "recover_balance", 1.0f);
+                            //SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_player", "idle", 1.0f);
                         });
                         ResetAnim = false;
                         isBackFlipping = false;

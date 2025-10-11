@@ -11,33 +11,20 @@ namespace MoveImprove.ivsdk
 {
     internal class RunRework
     {
-        // IniShit
-        private static float SprintDrain;
-        private static float RunDrain;
-        private static float WalkDrain;
-
-        // OtherShit
         private static bool CapsPressed;
         private static uint gTimer;
         private static uint fTimer;
         private static float pStam;
         private static bool IsCapsLockActive() => Control.IsKeyLocked(Keys.Capital);
         private static bool PressMoveKeys() => (NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) || NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) || NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) || NativeControls.IsGameKeyPressed(0, GameKey.MoveRight));
-        public static void Init(SettingsFile settings)
-        {
-            SprintDrain = settings.GetFloat("EXTENSIVE SETTINGS", "SprintDrain", 25.0f);
-            RunDrain = settings.GetFloat("EXTENSIVE SETTINGS", "RunDrain", 7.5f);
-            WalkDrain = settings.GetFloat("EXTENSIVE SETTINGS", "WalkDrain", 25.0f);
-        }
         public static void Tick()
         {
             if (IS_PLAYER_CONTROL_ON((int)Main.PlayerIndex))
             {
-                GET_FRAME_TIME(out float frameTime);
                 if (Main.SprintToVehicles && !IS_CHAR_ON_FOOT(Main.PlayerHandle) && !IS_CHAR_IN_ANY_CAR(Main.PlayerHandle))
                 {
                     float moveState = Main.PlayerPed.PedMoveBlendOnFoot.MoveState;
-                    moveState += 10.0f * frameTime;
+                    moveState += 10.0f * Main.frameTime;
                     if (!NativeControls.IsGameKeyPressed(0, GameKey.Sprint))
                         moveState = Main.Clamp(moveState, 0.0f, 2.0f);
 
@@ -60,50 +47,50 @@ namespace MoveImprove.ivsdk
                         CapsPressed = true;
                     }
                 }
-                if (Main.ForceRun && NativeControls.IsGameKeyPressed(0, GameKey.Sprint) && PressMoveKeys() && Main.PlayerPed.PlayerInfo.Stamina > 0)
+                if (Main.ForceRun && NativeControls.IsGameKeyPressed(0, GameKey.Sprint) && (IS_INTERIOR_SCENE() || IVPhoneInfo.ThePhoneInfo.State > 1000 || Main.PlayerPed.PedMoveBlendOnFoot.MoveState <= 1) && PressMoveKeys() && Main.PlayerPed.PlayerInfo.Stamina > 0)
                 {
                     GET_GAME_TIMER(out gTimer);
                     float moveState = Main.PlayerPed.PedMoveBlendOnFoot.MoveState;
                     if (IsCapsLockActive() || !Main.ToggleSprint)
                     {
-                        moveState += 4.0f * frameTime;
+                        moveState += 4.0f * Main.frameTime;
                         moveState = Main.Clamp(moveState, -3.0f, 3.0f);
                     }
                     else
                     {
                         if (moveState <= 2)
                         {
-                            moveState += 4.0f * frameTime;
+                            moveState += 4.0f * Main.frameTime;
                             moveState = Main.Clamp(moveState, -2.0f, 2.0f);
                         }
                     }
                     Main.PlayerPed.PedMoveBlendOnFoot.MoveState = moveState;
-
-                    if (Main.PlayerPed.PlayerInfo.NeverTired < 1)
-                    {
-                        if (Main.PlayerPed.PedMoveBlendOnFoot.MoveState > 2 && gTimer > fTimer + frameTime)
-                        {
-                            if (pStam <= Main.PlayerPed.PlayerInfo.Stamina || (pStam + (SprintDrain * frameTime) > 600.0f))
-                            {
-                                //IVGame.ShowSubtitleMessage(pStam.ToString() + "  " + Main.PlayerPed.PlayerInfo.Stamina.ToString());
-                                Main.PlayerPed.PlayerInfo.Stamina -= SprintDrain * frameTime;
-                            }
-                            pStam = Main.PlayerPed.PlayerInfo.Stamina;
-                            GET_GAME_TIMER(out fTimer);
-                        }
-                        else if (Main.PlayerPed.PedMoveBlendOnFoot.MoveState > 1)
-                        {
-                            if (pStam + (WalkDrain * frameTime) <= Main.PlayerPed.PlayerInfo.Stamina || (pStam + (RunDrain * frameTime) > 600.0f))
-                                Main.PlayerPed.PlayerInfo.Stamina -= RunDrain * frameTime;
-                            pStam = Main.PlayerPed.PlayerInfo.Stamina;
-                            GET_GAME_TIMER(out fTimer);
-                            //IVGame.ShowSubtitleMessage(pStam.ToString() + "  " + Main.PlayerPed.PlayerInfo.Stamina.ToString());
-                        }
-                    }
                     /*else if (Main.PlayerPed.PedMoveBlendOnFoot.MoveState > 0)
                     {
-                        Main.PlayerPed.PlayerInfo.Stamina -= WalkDrain * frameTime;
+                        Main.PlayerPed.PlayerInfo.Stamina -= WalkDrain * Main.frameTime;
                     }*/
+                }
+
+                if (Main.PlayerPed.PlayerInfo.NeverTired < 1 && Main.StaminaDrain)
+                {
+                    if (Main.PlayerPed.PedMoveBlendOnFoot.MoveState > 2 && gTimer > fTimer + Main.frameTime)
+                    {
+                        if (pStam <= Main.PlayerPed.PlayerInfo.Stamina || (pStam + (Main.SprintDrain * Main.frameTime) > 600.0f))
+                        {
+                            //IVGame.ShowSubtitleMessage(pStam.ToString() + "  " + Main.PlayerPed.PlayerInfo.Stamina.ToString());
+                            Main.PlayerPed.PlayerInfo.Stamina -= Main.SprintDrain * Main.frameTime;
+                        }
+                        pStam = Main.PlayerPed.PlayerInfo.Stamina;
+                        GET_GAME_TIMER(out fTimer);
+                    }
+                    else if (Main.PlayerPed.PedMoveBlendOnFoot.MoveState > 1)
+                    {
+                        if (pStam + (Main.WalkDrain * Main.frameTime) <= Main.PlayerPed.PlayerInfo.Stamina || (pStam + (Main.RunDrain * Main.frameTime) > 600.0f))
+                            Main.PlayerPed.PlayerInfo.Stamina -= Main.RunDrain * Main.frameTime;
+                        pStam = Main.PlayerPed.PlayerInfo.Stamina;
+                        GET_GAME_TIMER(out fTimer);
+                        //IVGame.ShowSubtitleMessage(pStam.ToString() + "  " + Main.PlayerPed.PlayerInfo.Stamina.ToString());
+                    }
                 }
             }
         }
