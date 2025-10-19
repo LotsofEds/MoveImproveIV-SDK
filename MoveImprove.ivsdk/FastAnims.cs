@@ -167,7 +167,7 @@ namespace MoveImprove.ivsdk
                 }
             }
 
-            else if (IS_PED_IN_COVER(Main.PlayerHandle))
+            else if (IS_PED_IN_COVER(Main.PlayerHandle) && !IS_CHAR_SHOOTING(Main.PlayerHandle))
             {
                 SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_l_low_centre", "pistol_flip_180", (Main.CoverTurnSpeed));
                 SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_l_low_centre", "unarmed_flip_180", (Main.CoverTurnSpeed));
@@ -232,6 +232,90 @@ namespace MoveImprove.ivsdk
                 SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_r_high_corner", "pistol_normal_fire_outro", (Main.PeekFromCoverSpeed));
                 SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_r_high_corner", "rifle_normal_fire_outro", (Main.PeekFromCoverSpeed));
 
+                // l_high_corner
+                if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "cover_l_high_corner", "ak47_blindfire"))
+                    SpeedUpBlindfire("cover_l_high_corner", "ak47_blindfire", 0.1067f, 0.84f);
+                else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "cover_l_high_corner", "pistol_blindfire"))
+                    SpeedUpBlindfire("cover_l_high_corner", "pistol_blindfire", 0.1063f, 0.7872f);
+                else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "cover_l_high_corner", "rifle_blindfire"))
+                    SpeedUpBlindfire("cover_l_high_corner", "rifle_blindfire", 0.2131f, 0.7868f);
+                else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "cover_l_high_corner", "rocket_blindfire"))
+                    SpeedUpBlindfire("cover_l_high_corner", "rocket_blindfire", 0.2280f, 0.7017f);
+                else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "cover_l_high_corner", "shotgun_blindfire"))
+                    SpeedUpBlindfire("cover_l_high_corner", "shotgun_blindfire", 0.2f, 0.8f);
+                else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "cover_l_high_corner", "uzi_blindfire"))
+                    SpeedUpBlindfire("cover_l_high_corner", "uzi_blindfire", 0.0297f, 0.9345f);
+
+                // r_high_corner
+                else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "cover_r_high_corner", "ak47_blindfire"))
+                    SpeedUpBlindfire("cover_r_high_corner", "ak47_blindfire", 0.0406f, 0.9069f);
+                else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "cover_r_high_corner", "pistol_blindfire"))
+                    SpeedUpBlindfire("cover_r_high_corner", "pistol_blindfire", 0.1086f, 0.7826f);
+                else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "cover_r_high_corner", "rifle_blindfire"))
+                    SpeedUpBlindfire("cover_r_high_corner", "rifle_blindfire", 0.3137f, 0.7058f);
+                else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "cover_r_high_corner", "rocket_blindfire"))
+                    SpeedUpBlindfire("cover_r_high_corner", "rocket_blindfire", 0.3061f, 0.7346f);
+                else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "cover_r_high_corner", "shotgun_blindfire"))
+                    SpeedUpBlindfire("cover_r_high_corner", "shotgun_blindfire", 0.2058f, 0.7941f);
+                else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "cover_r_high_corner", "uzi_blindfire"))
+                    SpeedUpBlindfire("cover_r_high_corner", "uzi_blindfire", 0.02994f, 0.9281f);
+
+                // l_low_center
+                else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "cover_l_low_centre", "ak47_blindfire"))
+                    SpeedUpBlindfire("cover_l_low_centre", "ak47_blindfire", 0.0558f, 0.8882f);
+                else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "cover_l_low_centre", "pistol_blindfire"))
+                    SpeedUpBlindfire("cover_l_low_centre", "pistol_blindfire", 0.1f, 0.76f);
+                else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "cover_l_low_centre", "rifle_blindfire"))
+                    SpeedUpBlindfire("cover_l_low_centre", "rifle_blindfire", 0.25f, 0.7236f);
+                else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "cover_l_low_centre", "rocket_blindfire"))
+                    SpeedUpBlindfire("cover_l_low_centre", "rocket_blindfire", 0.2826f, 0.7391f);
+                else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "cover_l_low_centre", "shotgun_blindfire"))
+                    SpeedUpBlindfire("cover_l_low_centre", "shotgun_blindfire", 0.225f, 0.7625f);
+                else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "cover_l_low_centre", "uzi_blindfire"))
+                    SpeedUpBlindfire("cover_l_low_centre", "uzi_blindfire", 0.2f, 0.6571f);
+
+                // r_low_center
+                else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "cover_r_low_centre", "ak47_blindfire"))
+                    SpeedUpBlindfire("cover_r_low_centre", "ak47_blindfire", 0.0561f, 0.9044f);
+                else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "cover_r_low_centre", "pistol_blindfire"))
+                    SpeedUpBlindfire("cover_r_low_centre", "pistol_blindfire", 0.1f, 0.76f);
+                else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "cover_r_low_centre", "rifle_blindfire"))
+                    SpeedUpBlindfire("cover_r_low_centre", "rifle_blindfire", 0.1976f, 0.8023f);
+                else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "cover_r_low_centre", "rocket_blindfire"))
+                    SpeedUpBlindfire("cover_r_low_centre", "rocket_blindfire", 0.3469f, 0.6734f);
+                else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "cover_r_low_centre", "shotgun_blindfire"))
+                    SpeedUpBlindfire("cover_r_low_centre", "shotgun_blindfire", 0.2112f, 0.7746f);
+                else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "cover_r_low_centre", "uzi_blindfire"))
+                    SpeedUpBlindfire("cover_r_low_centre", "uzi_blindfire", 0.09375f, 0.84375f);
+
+                // l_low_corner
+                else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "cover_l_low_corner", "ak47_blindfire"))
+                    SpeedUpBlindfire("cover_l_low_corner", "ak47_blindfire", 0.0847f, 0.8389f);
+                else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "cover_l_low_corner", "pistol_blindfire"))
+                    SpeedUpBlindfire("cover_l_low_corner", "pistol_blindfire", 0.0888f, 0.7333f);
+                else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "cover_l_low_corner", "rifle_blindfire"))
+                    SpeedUpBlindfire("cover_l_low_corner", "rifle_blindfire", 0.2236f, 0.7368f);
+                else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "cover_l_low_corner", "rocket_blindfire"))
+                    SpeedUpBlindfire("cover_l_low_corner", "rocket_blindfire", 0.3333f, 0.6315f);
+                else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "cover_l_low_corner", "shotgun_blindfire"))
+                    SpeedUpBlindfire("cover_l_low_corner", "shotgun_blindfire", 0.2179f, 0.7564f);
+                else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "cover_l_low_corner", "uzi_blindfire"))
+                    SpeedUpBlindfire("cover_l_low_corner", "uzi_blindfire", 0.1794f, 0.6923f);
+
+                // r_low_corner
+                else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "cover_r_low_corner", "ak47_blindfire"))
+                    SpeedUpBlindfire("cover_r_low_corner", "ak47_blindfire", 0.0588f, 0.9058f);
+                else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "cover_r_low_corner", "pistol_blindfire"))
+                    SpeedUpBlindfire("cover_r_low_corner", "pistol_blindfire", 0.1041f, 0.75f);
+                else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "cover_r_low_corner", "rifle_blindfire"))
+                    SpeedUpBlindfire("cover_r_low_corner", "rifle_blindfire", 0.2112f, 0.7887f);
+                else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "cover_r_low_corner", "rocket_blindfire"))
+                    SpeedUpBlindfire("cover_r_low_corner", "rocket_blindfire", 0.2745f, 0.7058f);
+                else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "cover_r_low_corner", "shotgun_blindfire"))
+                    SpeedUpBlindfire("cover_r_low_corner", "shotgun_blindfire", 0.2142f, 0.7714f);
+                else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "cover_r_low_corner", "uzi_blindfire"))
+                    SpeedUpBlindfire("cover_r_low_corner", "uzi_blindfire", 0.0355f, 0.9289f);
+
                 if (NativeControls.IsGameKeyPressed(0, GameKey.Sprint))
                 {
                     SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "move_combat_strafe", "walk", 1.5f);
@@ -283,6 +367,35 @@ namespace MoveImprove.ivsdk
                     SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "jump_rifle", "jump_on_spot", 2.0f);
                 else
                     SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "jump_rifle", "jump_on_spot", 1.0f);
+            }
+        }
+        private static void SpeedUpBlindfire(string animSet, string animName, float startTime, float endTime)
+        {
+            GET_CHAR_ANIM_TOTAL_TIME(Main.PlayerHandle, animSet, animName, out float totalTime);
+            GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, animSet, animName, out float animTime);
+
+            float startSpeed = (Main.BlindFireSpeed * startTime * (totalTime / 250));
+            float endSpeed = (Main.BlindFireSpeed * (1 - endTime) * (totalTime / 250));
+
+            //IVGame.ShowSubtitleMessage(startSpeed.ToString() + "  " + endSpeed.ToString());
+            if (animTime < startTime)
+            {
+                if (startSpeed > Main.BlindfireMaxSpd)
+                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, animSet, animName, Main.BlindfireMaxSpd);
+                else if (startSpeed > Main.BlindFireSpeed)
+                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, animSet, animName, startSpeed);
+                else
+                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, animSet, animName, Main.BlindFireSpeed);
+            }
+
+            else if (animTime > endTime)
+            {
+                if (endSpeed > Main.BlindfireMaxSpd)
+                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, animSet, animName, Main.BlindfireMaxSpd);
+                if (endSpeed > Main.BlindFireSpeed)
+                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, animSet, animName, endSpeed);
+                else
+                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, animSet, animName, Main.BlindFireSpeed);
             }
         }
         private static bool isMovingInCover()

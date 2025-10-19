@@ -43,6 +43,8 @@ namespace MoveImprove.ivsdk
         public static float EnterExitVehSpeed;
         public static float CrouchingSpeed;
         public static float HolsterSpeed;
+        public static float BlindFireSpeed;
+        public static float BlindfireMaxSpd;
         public static int NumOfWeapIDs;
 
         public static float SprintDrain;
@@ -86,6 +88,7 @@ namespace MoveImprove.ivsdk
                 TheDelayedCaller = null;
             }
             RagdollFix.UnInit();
+            AdvancedClimbing.UnInit();
         }
 
         private void Main_Initialized(object sender, EventArgs e)
@@ -180,12 +183,12 @@ namespace MoveImprove.ivsdk
             GetUpCrouch = settings.GetBoolean("MAIN", "GetUpCrouch", false);
             TightTurn = settings.GetBoolean("MAIN", "TighterTurns", false);
             StaminaDrain = settings.GetBoolean("MAIN", "ExtraStaminaDrain", false);
+            GrabEnable = settings.GetBoolean("MAIN", "GrabEnable", false);
 
             OldLedgeMethod = settings.GetBoolean("EXPERIMENTAL FEATURES", "OldJumpFromLedgeMethod", false);
             ExtremeClimbing = settings.GetBoolean("EXPERIMENTAL FEATURES", "ExtremeClimbing", false);
             ClimbDown = settings.GetBoolean("EXPERIMENTAL FEATURES", "ClimbDown", false);
             JumpFromLedges = settings.GetBoolean("EXPERIMENTAL FEATURES", "JumpFromLedges", false);
-            GrabEnable = settings.GetBoolean("EXPERIMENTAL FEATURES", "GrabEnable", false);
             FlipEnable = settings.GetBoolean("EXPERIMENTAL FEATURES", "FlipEnable", false);
             TackleEnable = settings.GetBoolean("EXPERIMENTAL FEATURES", "TackleEnable", false);
 
@@ -199,10 +202,12 @@ namespace MoveImprove.ivsdk
             EnterExitVehSpeed = settings.GetFloat("ANIMATION SPEED", "EnterandExitVehicles", 1.0f);
             CrouchingSpeed = settings.GetFloat("ANIMATION SPEED", "Crouching", 1.0f);
             HolsterSpeed = settings.GetFloat("ANIMATION SPEED", "Holstering", 1.0f);
+            BlindFireSpeed = settings.GetFloat("ANIMATION SPEED", "BlindfireStartEnd", 1.0f);
+            BlindfireMaxSpd = settings.GetFloat("ANIMATION SPEED", "BlindfireStartEndMax", 1.0f);
 
             // OtherShit
             ClimbDownKey = settings.GetKey("EXPERIMENTAL FEATURES", "ClimbDownKey", Keys.J);
-            GrabKey = (GameKey)settings.GetInteger("EXPERIMENTAL FEATURES", "GrabKey", 23);
+            GrabKey = (GameKey)settings.GetInteger("MAIN", "GrabKey", 23);
             NumOfWeapIDs = settings.GetInteger("MAIN", "NumOfWeaponIDs", 60);
 
             SprintDrain = settings.GetFloat("EXTENSIVE SETTINGS", "SprintDrain", 25.0f);

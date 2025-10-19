@@ -17,60 +17,67 @@ namespace MoveImprove.ivsdk
         private static float hdng;
         private static bool IsGrabbingLedge;
         private static bool DoClimbDown;
-        private static bool CanClimbDown;
         private static bool onLadder;
         public static Dictionary<UIntPtr, int> ObjHandles { get; private set; } = new Dictionary<UIntPtr, int>();
+
+        public static void UnInit()
+        {
+            DELETE_OBJECT(ref ObjHandle);
+            DELETE_OBJECT(ref LdrHandle);
+        }
         public static void Tick()
         {
-            if (!DoClimbDown && Main.ClimbDown && ((NativeControls.IsGameKeyPressed(0, GameKey.RadarZoom) && NativeControls.IsGameKeyPressed(0, GameKey.LookBehind)) || IVGame.IsKeyPressed(Main.ClimbDownKey)) && !IS_CHAR_DEAD(Main.PlayerHandle) && !IS_PED_RAGDOLL(Main.PlayerHandle) && !IS_CHAR_IN_AIR(Main.PlayerHandle) && !IS_CHAR_GETTING_UP(Main.PlayerHandle) && !Main.PlayerPed.IsInVehicle() && !IS_CHAR_GETTING_IN_TO_A_CAR(Main.PlayerHandle) && !IS_CHAR_SWIMMING(Main.PlayerHandle))
+            //IVGame.ShowSubtitleMessage(DoClimbDown.ToString() + "  "  + DOES_OBJECT_EXIST(ObjHandle).ToString());
+            if (!DoClimbDown)
+                DELETE_OBJECT(ref ObjHandle);
+
+            if (!DoClimbDown && Main.ClimbDown && ((NativeControls.IsGameKeyPressed(0, GameKey.RadarZoom) && NativeControls.IsGameKeyPressed(0, GameKey.LookBehind)) || IVGame.IsKeyPressed(Main.ClimbDownKey)) && !IS_CHAR_DEAD(Main.PlayerHandle) && !IS_PED_RAGDOLL(Main.PlayerHandle) && !IS_CHAR_GETTING_UP(Main.PlayerHandle) && !Main.PlayerPed.IsInVehicle() && !IS_CHAR_GETTING_IN_TO_A_CAR(Main.PlayerHandle) && !IS_CHAR_SWIMMING(Main.PlayerHandle))
             {
-                if (!DOES_OBJECT_EXIST(ObjHandle))
+                GET_CHAR_HEIGHT_ABOVE_GROUND(Main.PlayerHandle, out float pHeight);
+                if (!DOES_OBJECT_EXIST(ObjHandle) && pHeight < 1.1f)
                 {
+                    DoClimbDown = true;
                     GET_OFFSET_FROM_CHAR_IN_WORLD_COORDS(Main.PlayerHandle, 0f, 0.2f, 0f, out float pOffX, out float pOffY, out float pOffZ);
                     CREATE_OBJECT(GET_HASH_KEY("cj_dart_1"), pOffX, pOffY, pOffZ, out ObjHandle, true);
-                    ATTACH_OBJECT_TO_PED(ObjHandle, Main.PlayerHandle, (uint)eBone.BONE_ROOT, 0.0f, 0.2f, 0.0f, 0f, 0f, 0f, 0);
+                    //ATTACH_OBJECT_TO_PED(ObjHandle, Main.PlayerHandle, (uint)eBone.BONE_ROOT, 0.0f, 0.2f, 0.0f, 0f, 0f, 0f, 0);
                     SET_OBJECT_VISIBLE(ObjHandle, false);
-                    DoClimbDown = true;
-                }
-            }
-            if (DoClimbDown)
-            {
-                GET_OBJECT_COORDINATES(ObjHandle, out float objX, out float objY, out float objZ);
-                GET_GROUND_Z_FOR_3D_COORD(objX, objY, objZ, out groundDist);
-                GET_DISTANCE_BETWEEN_COORDS_3D(objX, objY, objZ, objX, objY, groundDist, out objDist);
 
-                DETACH_OBJECT(ObjHandle, true);
-                if (objDist > 3.25f)
-                {
-                    CanClimbDown = true;
+                    GET_OBJECT_COORDINATES(ObjHandle, out float objX, out float objY, out float objZ);
+                    GET_GROUND_Z_FOR_3D_COORD(objX, objY, objZ, out groundDist);
+                    GET_DISTANCE_BETWEEN_COORDS_3D(objX, objY, objZ, objX, objY, groundDist, out objDist);
 
-                    Main.TheDelayedCaller.Add(TimeSpan.FromMilliseconds(450), "Main", () =>
+                    //DETACH_OBJECT(ObjHandle, true);
+                    if (objDist > 3.25f)
                     {
-                        GET_OBJECT_VELOCITY(ObjHandle, out float VobjX, out float VobjY, out float VobjZ);
-                        if (VobjZ < -4.0f)
+                        Main.TheDelayedCaller.Add(TimeSpan.FromMilliseconds(500), "Main", () =>
                         {
-                            CREATE_OBJECT(GET_HASH_KEY("bm_ladder"), Main.PlayerPos.X, Main.PlayerPos.Y, Main.PlayerPos.Z + 10f, out LdrHandle, true);
-                            DELETE_OBJECT(ref ObjHandle);
-                            SET_OBJECT_VISIBLE(LdrHandle, false);
-                            Main.TheDelayedCaller.Add(TimeSpan.FromMilliseconds(50), "Main", () =>
+                            GET_OBJECT_VELOCITY(ObjHandle, out float VobjX, out float VobjY, out float VobjZ);
+                            if (VobjZ < -4.0f)
                             {
-                                ATTACH_OBJECT_TO_PED(LdrHandle, Main.PlayerHandle, (uint)eBone.BONE_ROOT, 0.0f, 0.25f, -2.8f, 0f, 0f, -3.2f, 0);
-                                Main.TheDelayedCaller.Add(TimeSpan.FromMilliseconds(20), "Main", () =>
+                                CREATE_OBJECT(GET_HASH_KEY("bm_ladder"), Main.PlayerPos.X, Main.PlayerPos.Y, Main.PlayerPos.Z + 10f, out LdrHandle, true);
+                                DELETE_OBJECT(ref ObjHandle);
+                                SET_OBJECT_VISIBLE(LdrHandle, false);
+                                Main.TheDelayedCaller.Add(TimeSpan.FromMilliseconds(50), "Main", () =>
                                 {
-                                    DETACH_OBJECT(LdrHandle, true);
-                                    _TASK_CLIMB_LADDER(Main.PlayerHandle, 0);
-                                    Main.TheDelayedCaller.Add(TimeSpan.FromMilliseconds(500), "Main", () =>
+                                    ATTACH_OBJECT_TO_PED(LdrHandle, Main.PlayerHandle, (uint)eBone.BONE_ROOT, 0.0f, 0.25f, -2.8f, 0f, 0f, -3.2f, 0);
+                                    Main.TheDelayedCaller.Add(TimeSpan.FromMilliseconds(20), "Main", () =>
                                     {
-                                        onLadder = true;
+                                        DETACH_OBJECT(LdrHandle, true);
+                                        _TASK_CLIMB_LADDER(Main.PlayerHandle, 0);
+                                        Main.TheDelayedCaller.Add(TimeSpan.FromMilliseconds(750), "Main", () =>
+                                        {
+                                            onLadder = true;
+                                        });
                                     });
                                 });
-                            });
-                        }
-                        else
-                            CanClimbDown = false;
-                    });
+                            }
+                            else
+                                DoClimbDown = false;
+                        });
+                    }
+                    else
+                        DoClimbDown = false;
                 }
-                DoClimbDown = false;
             }
             if (onLadder)
             {
@@ -79,14 +86,8 @@ namespace MoveImprove.ivsdk
                     DELETE_OBJECT(ref LdrHandle);
                     _TASK_JUMP(Main.PlayerHandle, true);
                     DoClimbDown = false;
-                    CanClimbDown = false;
                     onLadder = false;
                 }
-            }
-            else if (!CanClimbDown && !DoClimbDown && DOES_OBJECT_EXIST(ObjHandle))
-            {
-                DELETE_OBJECT(ref ObjHandle);
-                DoClimbDown = false;
             }
 
             if (Main.JumpFromLedges == true && IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "climb_std", "climb_idle"))
