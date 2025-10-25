@@ -76,12 +76,11 @@ namespace MoveImprove.ivsdk
                 else
                 {
                     GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_player", "sprint_turn_180_r", out turnpntr);
-                    if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
-                        StopUnarmed();
 
-                    if (turnpntr > 0.5 && turnpntr < 0.7)
+                    if (turnpntr > 0.5)
                     {
-                        SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_player", "sprint_turn_180_r", 0.87f);
+                        if (turnpntr < 0.7)
+                            SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_player", "sprint_turn_180_r", 0.87f);
                         if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
                             StopUnarmed();
                     }
@@ -94,12 +93,11 @@ namespace MoveImprove.ivsdk
                 else
                 {
                     GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_player", "sprint_turn_180_l", out turnpntr);
-                    if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
-                        StopUnarmed();
 
-                    if (turnpntr > 0.57 && turnpntr < 0.7)
+                    if (turnpntr > 0.57)
                     {
-                        SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_player", "sprint_turn_180_l", 0.84f);
+                        if (turnpntr < 0.7)
+                            SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "move_player", "sprint_turn_180_l", 0.84f);
                         if (!NativeControls.IsGameKeyPressed(0, GameKey.Aim) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
                             StopUnarmed();
                     }

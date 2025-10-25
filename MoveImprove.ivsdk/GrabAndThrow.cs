@@ -23,7 +23,7 @@ namespace MoveImprove.ivsdk
         public static void Tick()
         {
             GET_CURRENT_CHAR_WEAPON(Main.PlayerHandle, out int pWeap);
-            if (pWeap == 0 && (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "melee_counters", "dodge_back") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "melee_counters", "dodge_l") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "melee_counters", "dodge_r")))
+            if (pWeap == 0 && (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "melee_counters", "dodge_back") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "melee_counters", "dodge_l") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "melee_counters", "dodge_r") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "melee_counters", "dodge_low_l") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "melee_counters", "dodge_low_r")))
             {
                 if (!IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "veh@low", "jack_perp_ds") && !IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "veh@low", "jack_perp_ps") && (NativeControls.IsGameKeyPressed(0, Main.GrabKey) || NativeControls.IsGameKeyPressed(0, Main.GrabKey)))
                 {
