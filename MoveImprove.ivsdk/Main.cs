@@ -28,6 +28,7 @@ namespace MoveImprove.ivsdk
         public static bool TackleEnable;
         public static bool JumpTurnEnable;
         public static bool GetUpCrouch;
+        public static bool GetUpCrouchNPC;
         public static bool TightTurn;
         public static bool SprintToVehicles;
         public static bool ForceRun;
@@ -181,6 +182,7 @@ namespace MoveImprove.ivsdk
             JumpTurnEnable = settings.GetBoolean("MAIN", "InAirControl", false);
             FixRagdoll = settings.GetBoolean("MAIN", "RagdollFix", false);
             GetUpCrouch = settings.GetBoolean("MAIN", "GetUpCrouch", false);
+            GetUpCrouchNPC = settings.GetBoolean("MAIN", "GetUpCrouchNPCs", false);
             TightTurn = settings.GetBoolean("MAIN", "TighterTurns", false);
             StaminaDrain = settings.GetBoolean("MAIN", "ExtraStaminaDrain", false);
             GrabEnable = settings.GetBoolean("MAIN", "GrabEnable", false);

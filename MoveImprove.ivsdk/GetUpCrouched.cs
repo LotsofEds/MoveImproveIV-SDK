@@ -17,28 +17,31 @@ namespace MoveImprove.ivsdk
     {
         public static void Tick()
         {
-            foreach (var ped in PedHelper.PedHandles)
-            {
-                int pedHandle = ped.Value;
+                foreach (var ped in PedHelper.PedHandles)
+                {
+                    int pedHandle = ped.Value;
                 if (IS_CHAR_GETTING_UP(pedHandle) && !IS_PED_RAGDOLL(pedHandle) && (pedHandle != Main.PlayerHandle || IS_CHAR_DUCKING(pedHandle)))
                 {
-                    if (IS_CHAR_PLAYING_ANIM(pedHandle, "get_up", "get_up_fast"))
-                        TriggerDucking(pedHandle, "get_up", "get_up_fast", 0.4f);
+                    if ((!Main.GetUpCrouchNPC && pedHandle == Main.PlayerHandle) || Main.GetUpCrouchNPC)
+                    {
+                        if (IS_CHAR_PLAYING_ANIM(pedHandle, "get_up", "get_up_fast"))
+                            TriggerDucking(pedHandle, "get_up", "get_up_fast", 0.4f);
 
-                    else if (IS_CHAR_PLAYING_ANIM(pedHandle, "get_up", "get_up_normal"))
-                        TriggerDucking(pedHandle, "get_up", "get_up_normal", 0.55f);
+                        else if (IS_CHAR_PLAYING_ANIM(pedHandle, "get_up", "get_up_normal"))
+                            TriggerDucking(pedHandle, "get_up", "get_up_normal", 0.55f);
 
-                    else if (IS_CHAR_PLAYING_ANIM(pedHandle, "get_up", "get_up_slow"))
-                        TriggerDucking(pedHandle, "get_up", "get_up_slow", 0.45f);
+                        else if (IS_CHAR_PLAYING_ANIM(pedHandle, "get_up", "get_up_slow"))
+                            TriggerDucking(pedHandle, "get_up", "get_up_slow", 0.45f);
 
-                    else if (IS_CHAR_PLAYING_ANIM(pedHandle, "get_up_back", "get_up_fast"))
-                        TriggerDucking(pedHandle, "get_up_back", "get_up_fast", 0.4f);
+                        else if (IS_CHAR_PLAYING_ANIM(pedHandle, "get_up_back", "get_up_fast"))
+                            TriggerDucking(pedHandle, "get_up_back", "get_up_fast", 0.4f);
 
-                    else if (IS_CHAR_PLAYING_ANIM(pedHandle, "get_up_back", "get_up_normal"))
-                        TriggerDucking(pedHandle, "get_up_back", "get_up_normal", 0.3f);
+                        else if (IS_CHAR_PLAYING_ANIM(pedHandle, "get_up_back", "get_up_normal"))
+                            TriggerDucking(pedHandle, "get_up_back", "get_up_normal", 0.3f);
 
-                    else if (IS_CHAR_PLAYING_ANIM(pedHandle, "get_up_back", "get_up_slow"))
-                        TriggerDucking(pedHandle, "get_up_back", "get_up_slow", 0.5f);
+                        else if (IS_CHAR_PLAYING_ANIM(pedHandle, "get_up_back", "get_up_slow"))
+                            TriggerDucking(pedHandle, "get_up_back", "get_up_slow", 0.5f);
+                    }
                 }
             }
         }

@@ -64,6 +64,21 @@ namespace MoveImprove.ivsdk
                             moveState = Main.Clamp(moveState, -2.0f, 2.0f);
                         }
                     }
+                    if (moveState <= 1.2f)
+                    {
+                        SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "move_player", "walk", 1.25f);
+                        SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "move_player", "walk_b", 1.25f);
+                        SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "move_player", "walk_c", 1.25f);
+                        SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "move_player", "walk_up", 1.25f);
+                        SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "move_player", "walk_down", 1.25f);
+                        SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "move_player", "walk_turn_l", 1.25f);
+                        SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "move_player", "walk_turn_l2", 1.25f);
+                        SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "move_player", "walk_turn_l3", 1.25f);
+                        SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "move_player", "walk_turn_r", 1.25f);
+                        SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "move_player", "walk_turn_r2", 1.25f);
+                        SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "move_player", "walk_turn_r3", 1.25f);
+                    }
+                    //IVGame.ShowSubtitleMessage(moveState.ToString());
                     Main.PlayerPed.PedMoveBlendOnFoot.MoveState = moveState;
                     /*else if (Main.PlayerPed.PedMoveBlendOnFoot.MoveState > 0)
                     {
