@@ -12,16 +12,47 @@ namespace MoveImprove.ivsdk
     internal class FastAnims
     {
         private static float movepntr;
+        private static uint fTimer;
         private static bool speedUp;
+        private static bool getUp;
+        private static bool boostToCover;
         public static Vector3 PlyrPos;
         private static List<string> animList = new List<string>();
         private static float groundPos;
-
         public static void Init(SettingsFile settings)
         {
             string animString = settings.GetValue("MAIN", "HolsterAnims", "");
             foreach (var animName in animString.Split(','))
                 animList.Add(animName);
+        }
+        private static void CancelAnimEarly(string animSet, string animName, float stopTime)
+        {
+            if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, animSet, animName))
+            {
+                GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, animSet, animName, out movepntr);
+
+                if (movepntr > stopTime && (NativeControls.IsGameKeyPressed(0, GameKey.MoveBackward) || NativeControls.IsGameKeyPressed(2, GameKey.MoveBackward)))
+                    CLEAR_CHAR_TASKS(Main.PlayerHandle);
+            }
+        }
+        private static void CoverBoost(string animSet, string animName)
+        {
+            if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, animSet, animName))
+            {
+                GET_CHAR_VELOCITY(Main.PlayerHandle, out Vector3 pVel);
+
+                Vector3 dir = Vector3.Normalize(pVel);
+
+                GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, animSet, animName, out movepntr);
+
+                if (movepntr <= 0.25f)
+                    boostToCover = false;
+                if (movepntr > 0.25f && !boostToCover)
+                {
+                    boostToCover = true;
+                    APPLY_FORCE_TO_PED(Main.PlayerHandle, 3, dir.X * 8, dir.Y * 8, 0, 0, 0, 0, 0, 0, 1, 1);
+                }
+            }
         }
         private static void StandUp()
         {
@@ -32,34 +63,36 @@ namespace MoveImprove.ivsdk
                 if (!HAVE_ANIMS_LOADED("ragdoll_trans"))
                     REQUEST_ANIMS("ragdoll_trans");
                 Main.PlayerPed.ActivateDrunkRagdoll(500);
-                Main.TheDelayedCaller.Add(TimeSpan.FromMilliseconds(40), "Main", () =>
-                {
-                    PlyrPos = Main.PlayerPos;
-                    GET_GROUND_Z_FOR_3D_COORD(PlyrPos, out float groundZ);
-                    BLEND_FROM_NM_WITH_ANIM(Main.PlayerHandle, "move_crouch", "crouchidle2idle", 10, 0, 0, 0);
-                    //REMOVE_ANIMS("move_crouch");
-                    Main.TheDelayedCaller.Add(TimeSpan.FromMilliseconds(50), "Main", () =>
-                    {
-                        FREEZE_CHAR_POSITION(Main.PlayerHandle, true);
-                        Main.TheDelayedCaller.Add(TimeSpan.FromMilliseconds(350), "Main", () =>
-                        {
-                            if ((PlyrPos.Z - groundZ) <= 0.65f)
-                                groundPos = (PlyrPos.Z - groundZ);
-                            else
-                                groundPos = 0.65f;
-                            //IVGame.ShowSubtitleMessage(PlyrPos.Z.ToString() + "  " + groundZ.ToString() + "  " + (PlyrPos.Z - groundZ).ToString());
-                            FREEZE_CHAR_POSITION(Main.PlayerHandle, false);
-                            SET_CHAR_COORDINATES(Main.PlayerHandle, new Vector3(PlyrPos.X, PlyrPos.Y, (PlyrPos.Z - groundPos)));
-                            _TASK_PLAY_ANIM_NON_INTERRUPTABLE(Main.PlayerHandle, "recover_balance", "ragdoll_trans", 2, 0, 0, 0, 0, -1);
-                            //REMOVE_ANIMS("ragdoll_trans");
-                                speedUp = true;
-                        });
-                    });
-                });
+                GET_GAME_TIMER(out fTimer);
+                getUp = true;
             }
         }
         public static void Tick()
         {
+            if (getUp)
+            {
+                if (Main.gTimer >= fTimer + 440)
+                {
+                    GET_GROUND_Z_FOR_3D_COORD(PlyrPos, out float groundZ);
+                    if ((PlyrPos.Z - groundZ) <= 0.65f)
+                        groundPos = (PlyrPos.Z - groundZ);
+                    else
+                        groundPos = 0.65f;
+                    FREEZE_CHAR_POSITION(Main.PlayerHandle, false);
+                    SET_CHAR_COORDINATES(Main.PlayerHandle, new Vector3(PlyrPos.X, PlyrPos.Y, (PlyrPos.Z - groundPos)));
+                    _TASK_PLAY_ANIM_NON_INTERRUPTABLE(Main.PlayerHandle, "recover_balance", "ragdoll_trans", 2, 0, 0, 0, 0, -1);
+                    //REMOVE_ANIMS("ragdoll_trans");
+                    speedUp = true;
+                    getUp = false;
+                }
+                else if (Main.gTimer >= fTimer + 90 && !IS_PED_RAGDOLL(Main.PlayerHandle))
+                    FREEZE_CHAR_POSITION(Main.PlayerHandle, true);
+                else if (Main.gTimer >= fTimer + 40 && IS_PED_RAGDOLL(Main.PlayerHandle))
+                {
+                    PlyrPos = Main.PlayerPos;
+                    BLEND_FROM_NM_WITH_ANIM(Main.PlayerHandle, "move_crouch", "crouchidle2idle", 10, 0, 0, 0);
+                }
+            }
             if (speedUp)
             {
                 if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "ragdoll_trans", "recover_balance"))
@@ -88,14 +121,41 @@ namespace MoveImprove.ivsdk
                 SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_dive", "low_l_rifle_short", Main.GetInCoverSpeed);
                 SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_dive", "low_r_rifle_short", Main.GetInCoverSpeed);
 
-                if (IS_CHAR_DUCKING(Main.PlayerHandle))
-                {
-                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "move_crouch", "idle2crouchidle", (Main.CrouchingSpeed));
-                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "move_crouch_rifle", "idle2crouchidle", (Main.CrouchingSpeed));
-                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "move_crouch_rpg", "idle2crouchidle", (Main.CrouchingSpeed));
-                }
+                CoverBoost("cover_dive", "high_l_pistol");
+                CoverBoost("cover_dive", "high_r_pistol");
+                CoverBoost("cover_dive", "low_l_pistol");
+                CoverBoost("cover_dive", "low_r_pistol");
+                CoverBoost("cover_dive", "high_l_pistol_short");
+                CoverBoost("cover_dive", "high_r_pistol_short");
+                CoverBoost("cover_dive", "low_l_pistol_short");
+                CoverBoost("cover_dive", "low_r_pistol_short");
+                CoverBoost("cover_dive", "high_l_rifle");
+                CoverBoost("cover_dive", "high_r_rifle");
+                CoverBoost("cover_dive", "low_l_rifle");
+                CoverBoost("cover_dive", "low_r_rifle");
+                CoverBoost("cover_dive", "high_l_rifle_short");
+                CoverBoost("cover_dive", "high_r_rifle_short");
+                CoverBoost("cover_dive", "low_l_rifle_short");
+                CoverBoost("cover_dive", "low_r_rifle_short");
 
-                else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_crouch", "crouchidle2idle") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_crouch_rifle", "crouchidle2idle") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "pickup_object", "pickup_high") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "pickup_object", "pickup_low") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "pickup_object", "pickup_med") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "ev_dives", "plyr_roll_left") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "ev_dives", "plyr_roll_right"))
+                CancelAnimEarly("cover_dive", "high_l_pistol", 0.83f);
+                CancelAnimEarly("cover_dive", "high_r_pistol", 0.83f);
+                CancelAnimEarly("cover_dive", "low_l_pistol", 0.83f);
+                CancelAnimEarly("cover_dive", "low_r_pistol", 0.83f);
+                CancelAnimEarly("cover_dive", "high_l_pistol_short", 0.83f);
+                CancelAnimEarly("cover_dive", "high_r_pistol_short", 0.83f);
+                CancelAnimEarly("cover_dive", "low_l_pistol_short", 0.83f);
+                CancelAnimEarly("cover_dive", "low_r_pistol_short", 0.83f);
+                CancelAnimEarly("cover_dive", "high_l_rifle", 0.83f);
+                CancelAnimEarly("cover_dive", "high_r_rifle", 0.83f);
+                CancelAnimEarly("cover_dive", "low_l_rifle", 0.83f);
+                CancelAnimEarly("cover_dive", "low_r_rifle", 0.83f);
+                CancelAnimEarly("cover_dive", "high_l_rifle_short", 0.83f);
+                CancelAnimEarly("cover_dive", "high_r_rifle_short", 0.83f);
+                CancelAnimEarly("cover_dive", "low_l_rifle_short", 0.83f);
+                CancelAnimEarly("cover_dive", "low_r_rifle_short", 0.83f);
+
+                if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_crouch", "crouchidle2idle") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_crouch_rifle", "crouchidle2idle") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "pickup_object", "pickup_high") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "pickup_object", "pickup_low") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "pickup_object", "pickup_med") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "ev_dives", "plyr_roll_left") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "ev_dives", "plyr_roll_right"))
                 {
                     SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "pickup_object", "pickup_high", (Main.PickupObjectSpeed));
                     SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "pickup_object", "pickup_low", (Main.PickupObjectSpeed));
@@ -104,6 +164,13 @@ namespace MoveImprove.ivsdk
                     SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "ev_dives", "plyr_roll_right", (Main.CombatRollSpeed));
                     SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "move_crouch", "crouchidle2idle", (Main.CrouchingSpeed));
                     SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "move_crouch_rifle", "crouchidle2idle", (Main.CrouchingSpeed));
+                }
+
+                else if (IS_CHAR_DUCKING(Main.PlayerHandle))
+                {
+                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "move_crouch", "idle2crouchidle", (Main.CrouchingSpeed));
+                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "move_crouch_rifle", "idle2crouchidle", (Main.CrouchingSpeed));
+                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "move_crouch_rpg", "idle2crouchidle", (Main.CrouchingSpeed));
                 }
 
                 else if (IS_PED_CLIMBING(Main.PlayerHandle))
@@ -377,7 +444,6 @@ namespace MoveImprove.ivsdk
             float startSpeed = (Main.BlindFireSpeed * startTime * (totalTime / 250));
             float endSpeed = (Main.BlindFireSpeed * (1 - endTime) * (totalTime / 250));
 
-            //IVGame.ShowSubtitleMessage(startSpeed.ToString() + "  " + endSpeed.ToString());
             if (animTime < startTime)
             {
                 if (startSpeed > Main.BlindfireMaxSpd)

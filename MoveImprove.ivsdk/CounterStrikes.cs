@@ -22,35 +22,11 @@ namespace MoveImprove.ivsdk
         private static uint highDmg;
         private static uint batDmg;
         private static uint knifeDmg;
-        private static void DamageLow()
+        private static void DamageThePed(uint pedDmg)
         {
             IsCountering = true;
             GET_CHAR_HEALTH(pedHandle, out pedHealth);
-            SET_CHAR_HEALTH(pedHandle, (pedHealth - lowDmg));
-        }
-        private static void DamageMed()
-        {
-            IsCountering = true;
-            GET_CHAR_HEALTH(pedHandle, out pedHealth);
-            SET_CHAR_HEALTH(pedHandle, (pedHealth - medDmg));
-        }
-        private static void DamageHigh()
-        {
-            IsCountering = true;
-            GET_CHAR_HEALTH(pedHandle, out pedHealth);
-            SET_CHAR_HEALTH(pedHandle, (pedHealth - highDmg));
-        }
-        private static void DamageBat()
-        {
-            IsCountering = true;
-            GET_CHAR_HEALTH(pedHandle, out pedHealth);
-            SET_CHAR_HEALTH(pedHandle, (pedHealth - batDmg));
-        }
-        private static void DamageKnife()
-        {
-            IsCountering = true;
-            GET_CHAR_HEALTH(pedHandle, out pedHealth);
-            SET_CHAR_HEALTH(pedHandle, (pedHealth - knifeDmg));
+            SET_CHAR_HEALTH(pedHandle, (pedHealth - pedDmg));
         }
         public static void Init(SettingsFile settings)
         {
@@ -73,11 +49,14 @@ namespace MoveImprove.ivsdk
                 if (IS_CHAR_INJURED(pedHandle)) continue;
                 if (IS_CHAR_SITTING_IN_ANY_CAR(pedHandle)) continue;
 
-                if (!IS_PED_IN_COMBAT(pedHandle))
-                   SET_CHAR_READY_TO_BE_STUNNED(pedHandle, true);
+                if (Main.StunPunch)
+                {
+                    if (!IS_PED_IN_COMBAT(pedHandle))
+                        SET_CHAR_READY_TO_BE_STUNNED(pedHandle, true);
 
-                else
-                    SET_CHAR_READY_TO_BE_STUNNED(pedHandle, false);
+                    else
+                        SET_CHAR_READY_TO_BE_STUNNED(pedHandle, false);
+                }
 
                 if (!IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "melee_counters", "counter_right_2") && !IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "melee_counters", "counter_left_2") && !IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "melee_counters", "counter_back_2") && !IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "melee_counters", "counter_right_3") && !IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "melee_counters", "counter_left_3") && !IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "melee_counters", "counter_back_3") && !IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "melee_counters", "counter_right") && !IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "melee_counters", "counter_left") && !IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "melee_counters", "counter_back") && !IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "melee_baseball_extra", "counter_left") && !IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "melee_baseball_extra", "counter_right") && !IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "melee_baseball_extra", "counter_back") && !IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "melee_knife_extra", "counter_left") && !IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "melee_knife_extra", "counter_right") && !IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "melee_knife_extra", "counter_back"))
                     IsCountering = false;
@@ -86,10 +65,10 @@ namespace MoveImprove.ivsdk
                 {
                     GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "melee_counters", "counter_right_2", out CounterTime);
                     if (!IsCountering && CounterTime < 0.17 && CounterTime > 0.14)
-                        DamageMed();
+                        DamageThePed(medDmg);
 
                     else if (!IsCountering && CounterTime < 0.27 && CounterTime > 0.24)
-                        DamageMed();
+                        DamageThePed(medDmg);
 
                     else if (IsCountering && (CounterTime > 0.27 || (CounterTime < 0.24 && CounterTime > 0.17)))
                         IsCountering = false;
@@ -99,7 +78,7 @@ namespace MoveImprove.ivsdk
                 {
                     GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "melee_counters", "counter_back_3", out CounterTime);
                     if (!IsCountering && CounterTime < 0.23 && CounterTime > 0.2)
-                        DamageHigh();
+                        DamageThePed(highDmg);
 
                     else if (IsCountering && CounterTime > 0.23)
                         IsCountering = false;
@@ -109,10 +88,10 @@ namespace MoveImprove.ivsdk
                 {
                     GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "melee_counters", "counter_left_2", out CounterTime);
                     if (!IsCountering && CounterTime < 0.17 && CounterTime > 0.15)
-                        DamageMed();
+                        DamageThePed(medDmg);
 
                     else if (!IsCountering && CounterTime < 0.32 && CounterTime > 0.3)
-                        DamageMed();
+                        DamageThePed(medDmg);
 
                     else if (IsCountering && (CounterTime > 0.32 || (CounterTime < 0.3 && CounterTime > 0.17)))
                         IsCountering = false;
@@ -122,10 +101,10 @@ namespace MoveImprove.ivsdk
                 {
                     GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "melee_counters", "counter_left_3", out CounterTime);
                     if (!IsCountering && CounterTime < 0.135 && CounterTime > 0.11)
-                        DamageMed();
+                        DamageThePed(medDmg);
 
                     else if (!IsCountering && CounterTime < 0.345 && CounterTime > 0.32)
-                        DamageMed();
+                        DamageThePed(medDmg);
 
                     else if (IsCountering && (CounterTime > 0.345 || (CounterTime < 0.32 && CounterTime > 0.135)))
                         IsCountering = false;
@@ -135,10 +114,10 @@ namespace MoveImprove.ivsdk
                 {
                     GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "melee_counters", "counter_right_3", out CounterTime);
                     if (!IsCountering && CounterTime < 0.135 && CounterTime > 0.11)
-                        DamageMed();
+                        DamageThePed(medDmg);
 
                     else if (!IsCountering && CounterTime < 0.355 && CounterTime > 0.33)
-                        DamageMed();
+                        DamageThePed(medDmg);
 
                     else if (IsCountering && (CounterTime > 0.355 || (CounterTime < 0.33 && CounterTime > 0.135)))
                         IsCountering = false;
@@ -149,13 +128,13 @@ namespace MoveImprove.ivsdk
                     GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "melee_counters", "counter_back_2", out CounterTime);
                     
                     if (!IsCountering && CounterTime < 0.17 && CounterTime > 0.14)
-                        DamageLow();
+                        DamageThePed(lowDmg);
 
                     else if (!IsCountering && CounterTime < 0.34 && CounterTime > 0.31)
-                        DamageLow();
+                        DamageThePed(lowDmg);
 
                     else if (!IsCountering && CounterTime < 0.49 && CounterTime > 0.46)
-                        DamageLow();
+                        DamageThePed(lowDmg);
 
                     else if (IsCountering && (CounterTime > 0.49 || (CounterTime < 0.46 && CounterTime > 0.34) || (CounterTime < 0.31 && CounterTime > 0.17)))
                         IsCountering = false;
@@ -165,7 +144,7 @@ namespace MoveImprove.ivsdk
                 {
                     GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "melee_baseball_extra", "counter_left", out CounterTime);
                     if (!IsCountering && CounterTime < 0.14 && CounterTime > 0.1)
-                        DamageBat();
+                        DamageThePed(batDmg);
 
                     else if (IsCountering && CounterTime > 0.14)
                         IsCountering = false;
@@ -175,7 +154,7 @@ namespace MoveImprove.ivsdk
                 {
                     GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "melee_baseball_extra", "counter_right", out CounterTime);
                     if (!IsCountering && CounterTime < 0.21 && CounterTime > 0.17)
-                        DamageBat();
+                        DamageThePed(batDmg);
 
                     else if (IsCountering && CounterTime > 0.21)
                         IsCountering = false;
@@ -185,7 +164,7 @@ namespace MoveImprove.ivsdk
                 {
                     GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "melee_baseball_extra", "counter_back", out CounterTime);
                     if (!IsCountering && CounterTime < 0.145 && CounterTime > 0.12)
-                        DamageBat();
+                        DamageThePed(batDmg);
 
                     else if (IsCountering && CounterTime > 0.145)
                         IsCountering = false;
@@ -195,7 +174,7 @@ namespace MoveImprove.ivsdk
                 {
                     GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "melee_knife_extra", "counter_left", out CounterTime);
                     if (!IsCountering && CounterTime < 0.33 && CounterTime > 0.3)
-                        DamageKnife();
+                        DamageThePed(knifeDmg);
 
                     else if (IsCountering && CounterTime > 0.33)
                         IsCountering = false;
@@ -205,7 +184,7 @@ namespace MoveImprove.ivsdk
                 {
                     GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "melee_knife_extra", "counter_right", out CounterTime);
                     if (!IsCountering && CounterTime < 0.33 && CounterTime > 0.3)
-                        DamageKnife();
+                        DamageThePed(knifeDmg);
 
                     else if (IsCountering && CounterTime > 0.33)
                         IsCountering = false;
@@ -215,7 +194,7 @@ namespace MoveImprove.ivsdk
                 {
                     GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "melee_knife_extra", "counter_back", out CounterTime);
                     if (!IsCountering && CounterTime < 0.33 && CounterTime > 0.3)
-                        DamageKnife();
+                        DamageThePed(knifeDmg);
 
                     else if (IsCountering && CounterTime > 0.33)
                         IsCountering = false;
@@ -225,10 +204,10 @@ namespace MoveImprove.ivsdk
                 {
                     GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "melee_counters", "counter_back", out CounterTime);
                     if (!IsCountering && CounterTime < 0.205 && CounterTime > 0.17)
-                        DamageMed();
+                        DamageThePed(medDmg);
 
                     else if (!IsCountering && CounterTime < 0.365 && CounterTime > 0.33)
-                        DamageMed();
+                        DamageThePed(medDmg);
 
                     else if (IsCountering && (CounterTime > 0.365 || (CounterTime < 0.33 && CounterTime > 0.205)))
                         IsCountering = false;
@@ -238,10 +217,10 @@ namespace MoveImprove.ivsdk
                 {
                     GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "melee_counters", "counter_left", out CounterTime);
                     if (!IsCountering && CounterTime < 0.22 && CounterTime > 0.19)
-                        DamageMed();
+                        DamageThePed(medDmg);
 
                     else if (!IsCountering && CounterTime < 0.36 && CounterTime > 0.33)
-                        DamageMed();
+                        DamageThePed(medDmg);
 
                     else if (IsCountering && (CounterTime > 0.36 || (CounterTime < 0.33 && CounterTime > 0.22)))
                         IsCountering = false;
@@ -251,10 +230,10 @@ namespace MoveImprove.ivsdk
                 {
                     GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "melee_counters", "counter_right", out CounterTime);
                     if (!IsCountering && CounterTime < 0.185 && CounterTime > 0.15)
-                        DamageMed();
+                        DamageThePed(medDmg);
 
                     else if (!IsCountering && CounterTime < 0.365 && CounterTime > 0.33)
-                        DamageMed();
+                        DamageThePed(medDmg);
 
                     else if (IsCountering && (CounterTime > 0.365 || (CounterTime < 0.33 && CounterTime > 0.185)))
                         IsCountering = false;

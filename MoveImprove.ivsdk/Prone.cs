@@ -28,7 +28,6 @@ namespace MoveImprove.ivsdk
                 if (!isProne)
                 {
                     isProne = true;
-                    //IVGame.ShowSubtitleMessage("ass");
                     if (!HAVE_ANIMS_LOADED("misskbtruck"))
                         REQUEST_ANIMS("misskbtruck");
                     //_TASK_PLAY_ANIM_NON_INTERRUPTABLE(Main.PlayerHandle, "crawl_idle", "misskbtruck", 4.0f, 1, 0, 0, 0, -1);
@@ -37,7 +36,6 @@ namespace MoveImprove.ivsdk
                 else
                 {
                     isProne = false;
-                    //IVGame.ShowSubtitleMessage("tit");
                     if (!HAVE_ANIMS_LOADED("get_up"))
                         REQUEST_ANIMS("get_up");
                     _TASK_PLAY_ANIM(Main.PlayerHandle, "get_up_fast", "get_up", 4.0f, 0, 0, 1, 0, -1);
@@ -57,7 +55,6 @@ namespace MoveImprove.ivsdk
                 }
                 if (NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.NavLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.NavRight) && !isRolling)
                 {
-                    //IVGame.ShowSubtitleMessage("fwd");
                     if (!IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "misskbtruck", "crawl_fwd_loop"))
                         _TASK_PLAY_ANIM(Main.PlayerHandle, "crawl_fwd_loop", "misskbtruck", 4.0f, 1, 1, 1, 0, -1);
                     SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "misskbtruck", "crawl_fwd_loop", 2.0f);
@@ -65,14 +62,12 @@ namespace MoveImprove.ivsdk
                 else if (NativeControls.IsGameKeyPressed(0, GameKey.NavLeft) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.NavRight) && !isRolling)
                 {
                     isRolling = true;
-                    //IVGame.ShowSubtitleMessage("rollLeft");
                     if (!IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "misskbtruck", "crawl_roll_left"))
                         _TASK_PLAY_ANIM(Main.PlayerHandle, "crawl_roll_left", "misskbtruck", 4.0f, 0, 0, 1, 0, -1);
                 }
                 else if (NativeControls.IsGameKeyPressed(0, GameKey.NavRight) && !NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && !NativeControls.IsGameKeyPressed(0, GameKey.NavLeft) && !isRolling)
                 {
                     isRolling = true;
-                    //IVGame.ShowSubtitleMessage("rollRight");
                     if (!IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "misskbtruck", "crawl_roll_right"))
                         _TASK_PLAY_ANIM(Main.PlayerHandle, "crawl_roll_right", "misskbtruck", 4.0f, 0, 0, 1, 0, -1);
                 }

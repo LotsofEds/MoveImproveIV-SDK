@@ -37,7 +37,6 @@ namespace MoveImprove.ivsdk
                     hdngMax = camHdng + 1;
                 else
                     hdngMax = camHdng - 359;
-                //IVGame.ShowSubtitleMessage(pHdng.ToString() + "  " + camHdng.ToString() + "  " + hdngMin.ToString() + "  " + hdngMax.ToString());
 
                 if (isTurningLeft() && !(pHdng > hdngMin && pHdng < hdngMax))
                     SET_CHAR_HEADING(Main.PlayerHandle, pHdng + turnAmount * Main.frameTime);

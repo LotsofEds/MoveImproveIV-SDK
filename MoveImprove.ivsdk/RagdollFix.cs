@@ -24,6 +24,8 @@ namespace MoveImprove.ivsdk
         public static List<float> aList = new List<float>();
         private static bool myRagdoll;
         private static bool stopRagdoll;
+        private static bool getUp;
+        private static uint fTimer;
         private static bool isParachuting(int ped)=> (IS_CHAR_PLAYING_ANIM(ped, "parachute", "accelerate_2_idle") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "accelerate_loop") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "deccelerate") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "dec_2_acc") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "free_fall") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "free_fall_decelerate") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "free_fall_fast") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "free_fall_veer_left") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "free_fall_veer_right") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "full_brake_for_landing") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "full_brake_loop") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "hang_2_steer_l") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "hang_2_steer_r") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "hang_idle") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "hang_idle2") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "hang_2_steer_l") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "open_chute") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "steer_abwt_l") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "steer_abwt_r") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "steer_ab_l") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "steer_ab_r") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "steer_l") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "steer_l_less") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "steer_l_trans") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "steer_r") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "steer_r_less") || IS_CHAR_PLAYING_ANIM(ped, "parachute", "steer_r_trans"));
         private static bool isSlidingDown(int ped) => (IS_CHAR_PLAYING_ANIM(ped, "climb_std", "ladder_slide") || IS_CHAR_PLAYING_ANIM(ped, "climb_std", "ladder_jumpoff"));
         public static void Tick()
@@ -132,24 +134,31 @@ namespace MoveImprove.ivsdk
             else if (pVel.Z > -10.0)
                 stopRagdoll = false;
 
-            if (pVel.Z < -10.0 && !IS_PED_RAGDOLL(Main.PlayerHandle) && !isParachuting(Main.PlayerHandle) && !isSlidingDown(Main.PlayerHandle) && !stopRagdoll)
+            if (pVel.Z < -10.0 && !IS_PED_RAGDOLL(Main.PlayerHandle) && !IS_CHAR_IN_ANY_CAR(Main.PlayerHandle) && !isParachuting(Main.PlayerHandle) && !isSlidingDown(Main.PlayerHandle) && !stopRagdoll)
             {
                 SWITCH_PED_TO_RAGDOLL_WITH_FALL(Main.PlayerHandle, -1, -1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-                Main.TheDelayedCaller.Add(TimeSpan.FromMilliseconds(1000), "Main", () =>
-                {
-                    myRagdoll = true;
-                });
+                GET_GAME_TIMER(out fTimer);
+                myRagdoll = true;
             }
-            if (((pVel.X < 1.0 && pVel.X > -1.0 && pVel.Y < 1.0 && pVel.Y > -1.0 && pVel.Z < 1.0 && pVel.Z > -1.0) || IS_CHAR_SWIMMING(Main.PlayerHandle)) && myRagdoll)
+            if (myRagdoll && Main.gTimer >= fTimer + 1000)
             {
-                Main.TheDelayedCaller.Add(TimeSpan.FromMilliseconds(800), "Main", () =>
+                GET_CHAR_SPEED(Main.PlayerHandle, out float pSpd);
+                if (pSpd < 1.0f || IS_CHAR_IN_WATER(Main.PlayerHandle))
                 {
-                    if (pVel.X < 1.0 && pVel.X > -1.0 && pVel.Y < 1.0 && pVel.Y > -1.0 && pVel.Z < 1.0 && pVel.Z > -1.0 && myRagdoll)
+                    if (!getUp && !IS_CHAR_IN_WATER(Main.PlayerHandle))
+                    {
+                        GET_GAME_TIMER(out fTimer);
+                        getUp = true;
+                    }
+                    else
                     {
                         SWITCH_PED_TO_ANIMATED(Main.PlayerHandle, false);
+                        getUp = false;
                         myRagdoll = false;
                     }
-                });
+                }
+                if (!IS_PED_RAGDOLL(Main.PlayerHandle))
+                    myRagdoll = false;
             }
         }
         public static void Init()

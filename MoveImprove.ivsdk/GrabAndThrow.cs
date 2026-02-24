@@ -20,6 +20,15 @@ namespace MoveImprove.ivsdk
         private static int currPed;
         private static float finisherTime;
 
+        private static void ThrowPed(float dirX, float dirY, float dirZ)
+        {
+            if (!IS_PED_RAGDOLL(currPed))
+            {
+                SWITCH_PED_TO_RAGDOLL_WITH_FALL(currPed, 2500, 2500, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+                APPLY_FORCE_TO_PED(currPed, 3, dirX, dirY, 0, 0, 0, 0, 0, 0, 1, 1);
+                currPed = -1;
+            }
+        }
         public static void Tick()
         {
             GET_CURRENT_CHAR_WEAPON(Main.PlayerHandle, out int pWeap);
@@ -123,32 +132,13 @@ namespace MoveImprove.ivsdk
                 float dirZ = 0f;
 
                 if (leftCounter && IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "veh@std", "jack_perp_ds"))
-                {
-                    if (!IS_PED_RAGDOLL(currPed))
-                    {
-                        SWITCH_PED_TO_RAGDOLL_WITH_FALL(currPed, 2500, 2500, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-                        APPLY_FORCE_TO_PED(currPed, 3, dirX * 4, dirY * 4, 0, 0, 0, 0, 0, 0, 1, 1);
-                        currPed = -1;
-                    }
-                }
+                    ThrowPed(dirX * 4, dirY * 4, 0);
+
                 else if (rightCounter && IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "veh@std", "jack_perp_ps"))
-                {
-                    if (!IS_PED_RAGDOLL(currPed))
-                    {
-                        SWITCH_PED_TO_RAGDOLL_WITH_FALL(currPed, 2500, 2500, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-                        APPLY_FORCE_TO_PED(currPed, 3, dirX * -4, dirY * -4, 0, 0, 0, 0, 0, 0, 1, 1);
-                        currPed = -1;
-                    }
-                }
+                    ThrowPed(dirX * -4, dirY * -4, 0);
+
                 else if (fwdCounter && IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "missray2", "gbge_throwrubbish"))
-                {
-                    if (!IS_PED_RAGDOLL(currPed))
-                    {
-                        SWITCH_PED_TO_RAGDOLL_WITH_FALL(currPed, 2500, 2500, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-                        APPLY_FORCE_TO_PED(currPed, 3, dirX * 4, dirY * 4, 0, 0, 0.0f, 0, 0, 0, 1, 1);
-                        currPed = -1;
-                    }
-                }
+                    ThrowPed(dirX * 4, dirY * 4, 0);
             }
         }
     }

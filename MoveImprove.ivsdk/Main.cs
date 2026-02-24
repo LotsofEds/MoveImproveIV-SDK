@@ -22,7 +22,6 @@ namespace MoveImprove.ivsdk
         public static bool JumpFromLedges;
         public static bool FasterJacking;
         public static bool FixRagdoll;
-        public static bool OldLedgeMethod;
         public static bool GrabEnable;
         public static bool FlipEnable;
         public static bool TackleEnable;
@@ -34,6 +33,7 @@ namespace MoveImprove.ivsdk
         public static bool ForceRun;
         public static bool ToggleSprint;
         public static bool StaminaDrain;
+        public static bool StunPunch;
 
         public static float CombatRollSpeed;
         public static float PickupObjectSpeed;
@@ -60,6 +60,7 @@ namespace MoveImprove.ivsdk
         public static Vector3 PlayerPos { get; set; }
 
         public static float frameTime;
+        public static uint gTimer;
         public Main()
         {
             Uninitialize += Main_Uninitialize;
@@ -90,6 +91,7 @@ namespace MoveImprove.ivsdk
             }
             RagdollFix.UnInit();
             AdvancedClimbing.UnInit();
+            //SwitchTargets.UnInit();
         }
 
         private void Main_Initialized(object sender, EventArgs e)
@@ -114,6 +116,7 @@ namespace MoveImprove.ivsdk
 
             GET_CURRENT_CHAR_WEAPON(PlayerHandle, out int pWeap);
             GET_FRAME_TIME(out frameTime);
+            GET_GAME_TIMER(out gTimer);
 
             TheDelayedCaller.Process();
             PedHelper.GrabAllPeds();
@@ -137,7 +140,7 @@ namespace MoveImprove.ivsdk
                 GetUpCrouched.Tick();
             if (TightTurn)
                 TurnHelp.Tick();
-            //Pills.Tick();
+            //SwitchTargets.Tick();
         }
         // Credits to catsmackaroo
         public static float Clamp(float value, float min, float max)
@@ -186,13 +189,13 @@ namespace MoveImprove.ivsdk
             TightTurn = settings.GetBoolean("MAIN", "TighterTurns", false);
             StaminaDrain = settings.GetBoolean("MAIN", "ExtraStaminaDrain", false);
             GrabEnable = settings.GetBoolean("MAIN", "GrabEnable", false);
+            StunPunch = settings.GetBoolean("MAIN", "StunPunchEnable", false);
+            JumpFromLedges = settings.GetBoolean("MAIN", "JumpFromLedges", false);
 
-            OldLedgeMethod = settings.GetBoolean("EXPERIMENTAL FEATURES", "OldJumpFromLedgeMethod", false);
-            ExtremeClimbing = settings.GetBoolean("EXPERIMENTAL FEATURES", "ExtremeClimbing", false);
-            ClimbDown = settings.GetBoolean("EXPERIMENTAL FEATURES", "ClimbDown", false);
-            JumpFromLedges = settings.GetBoolean("EXPERIMENTAL FEATURES", "JumpFromLedges", false);
-            FlipEnable = settings.GetBoolean("EXPERIMENTAL FEATURES", "FlipEnable", false);
-            TackleEnable = settings.GetBoolean("EXPERIMENTAL FEATURES", "TackleEnable", false);
+            ExtremeClimbing = settings.GetBoolean("OTHER FEATURES", "ExtremeClimbing", false);
+            ClimbDown = settings.GetBoolean("OTHER FEATURES", "ClimbDown", false);
+            FlipEnable = settings.GetBoolean("OTHER FEATURES", "FlipEnable", false);
+            TackleEnable = settings.GetBoolean("OTHER FEATURES", "TackleEnable", false);
 
             // AnimSpeeds
             CombatRollSpeed = settings.GetFloat("ANIMATION SPEED", "CombatRoll", 1.0f);
@@ -208,7 +211,7 @@ namespace MoveImprove.ivsdk
             BlindfireMaxSpd = settings.GetFloat("ANIMATION SPEED", "BlindfireStartEndMax", 1.0f);
 
             // OtherShit
-            ClimbDownKey = settings.GetKey("EXPERIMENTAL FEATURES", "ClimbDownKey", Keys.J);
+            ClimbDownKey = settings.GetKey("OTHER FEATURES", "ClimbDownKey", Keys.J);
             GrabKey = (GameKey)settings.GetInteger("MAIN", "GrabKey", 23);
             NumOfWeapIDs = settings.GetInteger("MAIN", "NumOfWeaponIDs", 60);
 

@@ -17,9 +17,9 @@ namespace MoveImprove.ivsdk
     {
         public static void Tick()
         {
-                foreach (var ped in PedHelper.PedHandles)
-                {
-                    int pedHandle = ped.Value;
+            foreach (var ped in PedHelper.PedHandles)
+            {
+                int pedHandle = ped.Value;
                 if (IS_CHAR_GETTING_UP(pedHandle) && !IS_PED_RAGDOLL(pedHandle) && (pedHandle != Main.PlayerHandle || IS_CHAR_DUCKING(pedHandle)))
                 {
                     if ((!Main.GetUpCrouchNPC && pedHandle == Main.PlayerHandle) || Main.GetUpCrouchNPC)

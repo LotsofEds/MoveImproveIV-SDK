@@ -78,12 +78,7 @@ namespace MoveImprove.ivsdk
                         SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "move_player", "walk_turn_r2", 1.25f);
                         SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "move_player", "walk_turn_r3", 1.25f);
                     }
-                    //IVGame.ShowSubtitleMessage(moveState.ToString());
                     Main.PlayerPed.PedMoveBlendOnFoot.MoveState = moveState;
-                    /*else if (Main.PlayerPed.PedMoveBlendOnFoot.MoveState > 0)
-                    {
-                        Main.PlayerPed.PlayerInfo.Stamina -= WalkDrain * Main.frameTime;
-                    }*/
                 }
 
                 if (Main.PlayerPed.PlayerInfo.NeverTired < 1 && Main.StaminaDrain)
@@ -91,10 +86,8 @@ namespace MoveImprove.ivsdk
                     if (Main.PlayerPed.PedMoveBlendOnFoot.MoveState > 2 && gTimer > fTimer + Main.frameTime)
                     {
                         if (pStam <= Main.PlayerPed.PlayerInfo.Stamina || (pStam + (Main.SprintDrain * Main.frameTime) > 600.0f))
-                        {
-                            //IVGame.ShowSubtitleMessage(pStam.ToString() + "  " + Main.PlayerPed.PlayerInfo.Stamina.ToString());
                             Main.PlayerPed.PlayerInfo.Stamina -= Main.SprintDrain * Main.frameTime;
-                        }
+
                         pStam = Main.PlayerPed.PlayerInfo.Stamina;
                         GET_GAME_TIMER(out fTimer);
                     }
@@ -104,7 +97,6 @@ namespace MoveImprove.ivsdk
                             Main.PlayerPed.PlayerInfo.Stamina -= Main.RunDrain * Main.frameTime;
                         pStam = Main.PlayerPed.PlayerInfo.Stamina;
                         GET_GAME_TIMER(out fTimer);
-                        //IVGame.ShowSubtitleMessage(pStam.ToString() + "  " + Main.PlayerPed.PlayerInfo.Stamina.ToString());
                     }
                 }
             }
