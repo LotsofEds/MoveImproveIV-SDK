@@ -255,7 +255,11 @@ namespace MoveImprove.ivsdk
                 GET_MOUSE_INPUT(out int mX, out int mY);
                 float mSens = GET_MOUSE_SENSITIVITY();
 
-                camRot += new Vector3(-mY * mSens * 4, 0, -mX * mSens * 4);
+                GET_POSITION_OF_ANALOGUE_STICKS(0, out int leftX, out int leftY, out int rightX, out int rightY);
+
+                if (IS_USING_CONTROLLER())
+                    camRot += new Vector3(-rightY * Main.stickSens * Main.frameTime, 0, -rightX * Main.stickSens * Main.frameTime);
+                camRot += new Vector3(-mY * mSens * Main.mouseSens, 0, -mX * mSens * Main.mouseSens);
                 camRot.X = Main.Clamp(camRot.X, -70, 70);
                 SET_CAM_ROT(cam, camRot);
                 if (NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) && NativeControls.IsGameKeyPressed(0, GameKey.Action))

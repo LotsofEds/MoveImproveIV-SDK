@@ -35,6 +35,8 @@ namespace MoveImprove.ivsdk
         public static bool StaminaDrain;
         public static bool StunPunch;
 
+        public static float mouseSens;
+        public static float stickSens;
         public static float CombatRollSpeed;
         public static float PickupObjectSpeed;
         public static float ClimbAndShimmySpeed;
@@ -53,7 +55,6 @@ namespace MoveImprove.ivsdk
         public static float WalkDrain;
 
         // OtherShit
-        public static DelayedCalling TheDelayedCaller;
         public static IVPed PlayerPed { get; set; }
         public static uint PlayerIndex { get; set; }
         public static int PlayerHandle { get; set; }
@@ -67,7 +68,6 @@ namespace MoveImprove.ivsdk
             Initialized += Main_Initialized;
             Tick += Main_Tick;
             KeyDown += Main_KeyDown;
-            TheDelayedCaller = new DelayedCalling();
         }
 
         public static void Main_KeyDown(object sender, KeyEventArgs e)
@@ -81,32 +81,26 @@ namespace MoveImprove.ivsdk
                     FlipsNShit.DoBackFlip();
             }
         }
-
         private void Main_Uninitialize(object sender, EventArgs e)
         {
-            if (TheDelayedCaller != null)
-            {
-                TheDelayedCaller.ClearAll();
-                TheDelayedCaller = null;
-            }
-            RagdollFix.UnInit();
             AdvancedClimbing.UnInit();
+            RagdollFix.UnInit();
+            GetUpCrouched.UnInit();
             //SwitchTargets.UnInit();
         }
-
         private void Main_Initialized(object sender, EventArgs e)
         {
             LoadSettings(Settings);
+
             if (Improve180Turn)
                 Alt180TurnScript.Init(Settings);
             FastAnims.Init(Settings);
-            RagdollFix.Init();
             JumpTurn.Init(Settings);
             CounterStrikes.Init(Settings);
             TurnHelp.Init(Settings);
+            GrabAndThrow.Init(Settings);
             //Prone.Init();
         }
-
         private void Main_Tick(object sender, EventArgs e)
         {
             PlayerPed = IVPed.FromUIntPtr(IVPlayerInfo.FindThePlayerPed());
@@ -118,7 +112,6 @@ namespace MoveImprove.ivsdk
             GET_FRAME_TIME(out frameTime);
             GET_GAME_TIMER(out gTimer);
 
-            TheDelayedCaller.Process();
             PedHelper.GrabAllPeds();
             FastAnims.Tick();
             CounterStrikes.Tick();
@@ -191,6 +184,8 @@ namespace MoveImprove.ivsdk
             GrabEnable = settings.GetBoolean("MAIN", "GrabEnable", false);
             StunPunch = settings.GetBoolean("MAIN", "StunPunchEnable", false);
             JumpFromLedges = settings.GetBoolean("MAIN", "JumpFromLedges", false);
+            mouseSens = settings.GetFloat("MAIN", "OnLedgeMouseSensitivity", 0.5f);
+            stickSens = settings.GetFloat("MAIN", "OnLedgeStickSensitivity", 0.5f);
 
             ExtremeClimbing = settings.GetBoolean("OTHER FEATURES", "ExtremeClimbing", false);
             ClimbDown = settings.GetBoolean("OTHER FEATURES", "ClimbDown", false);

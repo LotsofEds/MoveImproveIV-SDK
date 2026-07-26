@@ -12,6 +12,9 @@ namespace MoveImprove.ivsdk
 {
     internal class GrabAndThrow
     {
+        // IniShit
+        private static uint healthThresh;
+
         private static bool leftCounter;
         private static bool rightCounter;
         private static bool fwdCounter;
@@ -29,6 +32,10 @@ namespace MoveImprove.ivsdk
                 currPed = -1;
             }
         }
+        public static void Init(SettingsFile settings)
+        {
+            healthThresh = settings.GetUInteger("MAIN", "GrabHealthThresh", 140);
+        }
         public static void Tick()
         {
             GET_CURRENT_CHAR_WEAPON(Main.PlayerHandle, out int pWeap);
@@ -36,6 +43,7 @@ namespace MoveImprove.ivsdk
             {
                 if (!IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "veh@low", "jack_perp_ds") && !IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "veh@low", "jack_perp_ps") && (NativeControls.IsGameKeyPressed(0, Main.GrabKey) || NativeControls.IsGameKeyPressed(0, Main.GrabKey)))
                 {
+                    bool canThrow = false;
                     if (!HAVE_ANIMS_LOADED("misspackie1"))
                         REQUEST_ANIMS("misspackie1");
                     if (!HAVE_ANIMS_LOADED("visemes@m_hi"))
@@ -58,24 +66,32 @@ namespace MoveImprove.ivsdk
                         if (IS_CHAR_DEAD(pedHandle)) continue;
                         if (IS_CHAR_INJURED(pedHandle)) continue;
                         if (IS_CHAR_SITTING_IN_ANY_CAR(pedHandle)) continue;
+                        if (IS_CHAR_HEALTH_GREATER(pedHandle, healthThresh)) continue;
 
                         if (IS_PLAYER_TARGETTING_CHAR((int)Main.PlayerIndex, pedHandle))
+                        {
+                            canThrow = true;
                             currPed = pedHandle;
+                            break;
+                        }
                     }
-                    if (NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) || NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft))
+                    if (canThrow)
                     {
-                        _TASK_PLAY_ANIM(Main.PlayerHandle, "jack_perp_ds", "veh@std", 4.0f, 0, 0, 0, 0, -1);
-                        leftCounter = true;
-                    }
-                    else if (NativeControls.IsGameKeyPressed(0, GameKey.MoveRight) || NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
-                    {
-                        _TASK_PLAY_ANIM(Main.PlayerHandle, "jack_perp_ps", "veh@std", 4.0f, 0, 0, 0, 0, -1);
-                        rightCounter = true;
-                    }
-                    else if (NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) || NativeControls.IsGameKeyPressed(0, GameKey.MoveForward))
-                    {
-                        _TASK_PLAY_ANIM(Main.PlayerHandle, "gbge_throwrubbish", "missray2", 4.0f, 0, 0, 0, 0, -1);
-                        fwdCounter = true;
+                        if (NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) || NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft))
+                        {
+                            _TASK_PLAY_ANIM(Main.PlayerHandle, "jack_perp_ds", "veh@std", 4.0f, 0, 0, 0, 0, -1);
+                            leftCounter = true;
+                        }
+                        else if (NativeControls.IsGameKeyPressed(0, GameKey.MoveRight) || NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
+                        {
+                            _TASK_PLAY_ANIM(Main.PlayerHandle, "jack_perp_ps", "veh@std", 4.0f, 0, 0, 0, 0, -1);
+                            rightCounter = true;
+                        }
+                        else if (NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) || NativeControls.IsGameKeyPressed(0, GameKey.MoveForward))
+                        {
+                            _TASK_PLAY_ANIM(Main.PlayerHandle, "gbge_throwrubbish", "missray2", 4.0f, 0, 0, 0, 0, -1);
+                            fwdCounter = true;
+                        }
                     }
                 }
             }

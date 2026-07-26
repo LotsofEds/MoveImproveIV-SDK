@@ -3,6 +3,7 @@ using IVSDKDotNet;
 using IVSDKDotNet.Enums;
 using IVSDKDotNet.Native;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -15,6 +16,14 @@ namespace MoveImprove.ivsdk
 {
     internal class GetUpCrouched
     {
+        private static List<int> pedList = new List<int>();
+        private static List<uint> timerList = new List<uint>();
+
+        public static void UnInit()
+        {
+            pedList.Clear();
+            timerList.Clear();
+        }
         public static void Tick()
         {
             foreach (var ped in PedHelper.PedHandles)
@@ -44,6 +53,27 @@ namespace MoveImprove.ivsdk
                     }
                 }
             }
+
+            for (int i = 0; i < pedList.Count; i++)
+            {
+                if (!DOES_CHAR_EXIST(pedList[i]) || Main.gTimer >= timerList[i] + 40)
+                {
+                    if (DOES_CHAR_EXIST(pedList[i]))
+                    {
+                        BLEND_FROM_NM_WITH_ANIM(pedList[i], "move_crouch", "idle2crouchidle", 8, 0, 0, 0);
+                        SET_CHAR_ANIM_CURRENT_TIME(pedList[i], "move_crouch", "idle2crouchidle", 0.6f);
+                        if (!IS_CHAR_DUCKING(pedList[i]))
+                        {
+                            if (pedList[i] == Main.PlayerHandle)
+                                SET_CHAR_DUCKING_TIMED(pedList[i], -1);
+                            else
+                                SET_CHAR_DUCKING_TIMED(pedList[i], 100);
+                        }
+                    }
+                    pedList.RemoveAt(i);
+                    timerList.RemoveAt(i);
+                }
+            }
         }
         private static void TriggerDucking(int ped, string animGroup, string animName, float timeToStop)
         {
@@ -52,19 +82,11 @@ namespace MoveImprove.ivsdk
             {
                 SWITCH_PED_TO_RAGDOLL(ped, 0, 500, true, true, true, false);
 
-                Main.TheDelayedCaller.Add(TimeSpan.FromMilliseconds(40), "Main", () =>
+                if (!pedList.Contains(ped))
                 {
-                    BLEND_FROM_NM_WITH_ANIM(ped, "move_crouch", "idle2crouchidle", 8, 0, 0, 0);
-                    SET_CHAR_ANIM_CURRENT_TIME(ped, "move_crouch", "idle2crouchidle", 0.6f);
-                    //SET_CHAR_ANIM_CURRENT_TIME(ped, animGroup, animName, 1.0f);
-                    if (!IS_CHAR_DUCKING(ped))
-                    {
-                        if (ped == Main.PlayerHandle)
-                            SET_CHAR_DUCKING_TIMED(ped, -1);
-                        else
-                            SET_CHAR_DUCKING_TIMED(ped, 100);
-                    }
-                });
+                    pedList.Add(ped);
+                    timerList.Add(Main.gTimer);
+                }
             }
         }
     }

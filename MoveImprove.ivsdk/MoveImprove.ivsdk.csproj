@@ -54,7 +54,6 @@
     <Compile Include="Alt180TurnScript.cs" />
     <Compile Include="FlipsNShit.cs" />
     <Compile Include="CounterStrikes.cs" />
-    <Compile Include="DelayedCaller.cs" />
     <Compile Include="FastAnims.cs" />
     <Compile Include="FasterJackingScript.cs" />
     <Compile Include="RunRework.cs" />
