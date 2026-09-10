@@ -14,6 +14,8 @@ namespace MoveImprove.ivsdk
     {
         // IniShit
         private static uint healthThresh;
+        private static float staminaDrain;
+        private static float fatigueDrain;
 
         private static bool leftCounter;
         private static bool rightCounter;
@@ -35,6 +37,8 @@ namespace MoveImprove.ivsdk
         public static void Init(SettingsFile settings)
         {
             healthThresh = settings.GetUInteger("MAIN", "GrabHealthThresh", 140);
+            staminaDrain = settings.GetFloat("MAIN", "GrabStaminaDrain", 25);
+            fatigueDrain = settings.GetFloat("MAIN", "GrabFatigueDrain", 1.0f);
         }
         public static void Tick()
         {
@@ -70,9 +74,12 @@ namespace MoveImprove.ivsdk
 
                         if (IS_PLAYER_TARGETTING_CHAR((int)Main.PlayerIndex, pedHandle))
                         {
-                            canThrow = true;
-                            currPed = pedHandle;
-                            break;
+                            if (Main.staminaBar >= staminaDrain)
+                            {
+                                canThrow = true;
+                                currPed = pedHandle;
+                                break;
+                            }
                         }
                     }
                     if (canThrow)
@@ -80,16 +87,22 @@ namespace MoveImprove.ivsdk
                         if (NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) || NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft))
                         {
                             _TASK_PLAY_ANIM(Main.PlayerHandle, "jack_perp_ds", "veh@std", 4.0f, 0, 0, 0, 0, -1);
+                            Main.staminaBar -= staminaDrain;
+                            Main.maxStamina -= fatigueDrain;
                             leftCounter = true;
                         }
                         else if (NativeControls.IsGameKeyPressed(0, GameKey.MoveRight) || NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
                         {
                             _TASK_PLAY_ANIM(Main.PlayerHandle, "jack_perp_ps", "veh@std", 4.0f, 0, 0, 0, 0, -1);
+                            Main.staminaBar -= staminaDrain;
+                            Main.maxStamina -= fatigueDrain;
                             rightCounter = true;
                         }
                         else if (NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) || NativeControls.IsGameKeyPressed(0, GameKey.MoveForward))
                         {
                             _TASK_PLAY_ANIM(Main.PlayerHandle, "gbge_throwrubbish", "missray2", 4.0f, 0, 0, 0, 0, -1);
+                            Main.staminaBar -= staminaDrain;
+                            Main.maxStamina -= fatigueDrain;
                             fwdCounter = true;
                         }
                     }

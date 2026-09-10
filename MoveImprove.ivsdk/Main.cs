@@ -34,6 +34,7 @@ namespace MoveImprove.ivsdk
         public static bool ToggleSprint;
         public static bool StaminaDrain;
         public static bool StunPunch;
+        public static bool meleeStamina;
 
         public static float mouseSens;
         public static float stickSens;
@@ -48,11 +49,13 @@ namespace MoveImprove.ivsdk
         public static float HolsterSpeed;
         public static float BlindFireSpeed;
         public static float BlindfireMaxSpd;
-        public static int NumOfWeapIDs;
 
         public static float SprintDrain;
         public static float RunDrain;
         public static float WalkDrain;
+
+        public static float staminaBar;
+        public static float maxStamina;
 
         // OtherShit
         public static IVPed PlayerPed { get; set; }
@@ -66,6 +69,7 @@ namespace MoveImprove.ivsdk
         {
             Uninitialize += Main_Uninitialize;
             Initialized += Main_Initialized;
+            IngameStartup += Main_IngameStartup;
             Tick += Main_Tick;
             KeyDown += Main_KeyDown;
         }
@@ -86,6 +90,7 @@ namespace MoveImprove.ivsdk
             AdvancedClimbing.UnInit();
             RagdollFix.UnInit();
             GetUpCrouched.UnInit();
+            MeleeStamina.Uninit();
             //SwitchTargets.UnInit();
         }
         private void Main_Initialized(object sender, EventArgs e)
@@ -99,7 +104,22 @@ namespace MoveImprove.ivsdk
             CounterStrikes.Init(Settings);
             TurnHelp.Init(Settings);
             GrabAndThrow.Init(Settings);
+            if (meleeStamina)
+            MeleeStamina.Init(Settings);
+            //IVText.TheIVText.ReplaceTextOfTextLabel("R4KNIFE", "~s~To disarm your opponent, tap ~INPUT_MELEE_BLOCK~ to dodge then press ~INPUT_MELEE_KICK~ to disarm.");
+            //IVText.TheIVText.ReplaceTextOfTextLabel("ROM4_36", "While locked on:~n~~INPUT_MELEE_ATTACK1~ to punch.~n~~INPUT_MELEE_ATTACK2~ for alternative punch.~n~~s~~INPUT_MELEE_KICK~ to kick.");
             //Prone.Init();
+        }
+        private void Main_IngameStartup(object sender, EventArgs e)
+        {
+            if (meleeStamina)
+                MeleeStamina.IngameStart();
+        }
+        private static bool InitialChecks()
+        {
+            if (IS_SCREEN_FADED_OUT()) return false;
+            if (IS_PAUSE_MENU_ACTIVE()) return false;
+            return true;
         }
         private void Main_Tick(object sender, EventArgs e)
         {
@@ -108,9 +128,15 @@ namespace MoveImprove.ivsdk
             PlayerHandle = PlayerPed.GetHandle();
             PlayerPos = PlayerPed.Matrix.Pos;
 
-            GET_CURRENT_CHAR_WEAPON(PlayerHandle, out int pWeap);
+            if (!InitialChecks())
+                return;
+            if (PlayerPed == null)
+                return;
+
             GET_FRAME_TIME(out frameTime);
             GET_GAME_TIMER(out gTimer);
+
+            GET_CURRENT_CHAR_WEAPON(PlayerHandle, out int pWeap);
 
             PedHelper.GrabAllPeds();
             FastAnims.Tick();
@@ -134,6 +160,8 @@ namespace MoveImprove.ivsdk
             if (TightTurn)
                 TurnHelp.Tick();
             //SwitchTargets.Tick();
+            if (meleeStamina)
+                MeleeStamina.Tick();
         }
         // Credits to catsmackaroo
         public static float Clamp(float value, float min, float max)
@@ -186,6 +214,7 @@ namespace MoveImprove.ivsdk
             JumpFromLedges = settings.GetBoolean("MAIN", "JumpFromLedges", false);
             mouseSens = settings.GetFloat("MAIN", "OnLedgeMouseSensitivity", 0.5f);
             stickSens = settings.GetFloat("MAIN", "OnLedgeStickSensitivity", 0.5f);
+            meleeStamina = settings.GetBoolean("MELEE STAMINA", "Enable", true);
 
             ExtremeClimbing = settings.GetBoolean("OTHER FEATURES", "ExtremeClimbing", false);
             ClimbDown = settings.GetBoolean("OTHER FEATURES", "ClimbDown", false);
@@ -208,7 +237,6 @@ namespace MoveImprove.ivsdk
             // OtherShit
             ClimbDownKey = settings.GetKey("OTHER FEATURES", "ClimbDownKey", Keys.J);
             GrabKey = (GameKey)settings.GetInteger("MAIN", "GrabKey", 23);
-            NumOfWeapIDs = settings.GetInteger("MAIN", "NumOfWeaponIDs", 60);
 
             SprintDrain = settings.GetFloat("EXTENSIVE SETTINGS", "SprintDrain", 25.0f);
             RunDrain = settings.GetFloat("EXTENSIVE SETTINGS", "RunDrain", 7.5f);
