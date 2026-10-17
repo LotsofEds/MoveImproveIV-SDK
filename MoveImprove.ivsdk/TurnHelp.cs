@@ -46,14 +46,22 @@ namespace MoveImprove.ivsdk
         }
         private static bool isTurningLeft()
         {
-            if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_player", "run_turn_l") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_player", "run_turn_l2") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_player", "sprint_turn_l") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_rifle", "run_turn_l") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_rifle", "run_turn_l2") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_rifle", "sprint_turn_l") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_rpg", "run_turn_l") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_rpg", "run_turn_l2") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_rpg", "sprint_turn_l"))
+            if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_player", "run_turn_l") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_player", "run_turn_l2")
+                || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_player", "sprint_turn_l") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_rifle", "run_turn_l")
+                || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_rifle", "run_turn_l2") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_rifle", "sprint_turn_l")
+                || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_rpg", "run_turn_l") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_rpg", "run_turn_l2")
+                || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_rpg", "sprint_turn_l"))
                 return true;
             else
                 return false;
         }
         private static bool isTurningRight()
         {
-            if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_player", "run_turn_r") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_player", "run_turn_r2") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_player", "sprint_turn_r") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_rifle", "run_turn_r") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_rifle", "run_turn_r2") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_rifle", "sprint_turn_r") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_rpg", "run_turn_r") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_rpg", "run_turn_r2") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_rpg", "sprint_turn_r"))
+            if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_player", "run_turn_r") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_player", "run_turn_r2")
+                || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_player", "sprint_turn_r") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_rifle", "run_turn_r")
+                || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_rifle", "run_turn_r2") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_rifle", "sprint_turn_r")
+                || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_rpg", "run_turn_r") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_rpg", "run_turn_r2")
+                || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_rpg", "sprint_turn_r"))
                 return true;
             else
                 return false;

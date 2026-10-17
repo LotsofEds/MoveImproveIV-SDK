@@ -17,7 +17,8 @@ namespace MoveImprove.ivsdk
         public static GameKey GrabKey;
 
         public static bool Improve180Turn;
-        public static bool ExtremeClimbing;
+        public static bool extremeClimbing;
+        public static bool veryExtremeClimbing;
         public static bool ClimbDown;
         public static bool JumpFromLedges;
         public static bool FasterJacking;
@@ -57,6 +58,8 @@ namespace MoveImprove.ivsdk
         public static float staminaBar;
         public static float maxStamina;
 
+        public static List<string> animList = new List<string>();
+
         // OtherShit
         public static IVPed PlayerPed { get; set; }
         public static uint PlayerIndex { get; set; }
@@ -90,22 +93,24 @@ namespace MoveImprove.ivsdk
             AdvancedClimbing.UnInit();
             RagdollFix.UnInit();
             GetUpCrouched.UnInit();
-            MeleeStamina.Uninit();
+            MeleeStamina.UnInit();
+            ExtremeClimbing.UnInit();
             //SwitchTargets.UnInit();
         }
         private void Main_Initialized(object sender, EventArgs e)
         {
             LoadSettings(Settings);
 
-            if (Improve180Turn)
-                Alt180TurnScript.Init(Settings);
+            Alt180TurnScript.Init(Settings);
             FastAnims.Init(Settings);
             JumpTurn.Init(Settings);
             CounterStrikes.Init(Settings);
             TurnHelp.Init(Settings);
             GrabAndThrow.Init(Settings);
-            if (meleeStamina)
             MeleeStamina.Init(Settings);
+            AdvancedClimbing.Init();
+            FasterJackingScript.Init();
+            RagdollFix.Init();
             //IVText.TheIVText.ReplaceTextOfTextLabel("R4KNIFE", "~s~To disarm your opponent, tap ~INPUT_MELEE_BLOCK~ to dodge then press ~INPUT_MELEE_KICK~ to disarm.");
             //IVText.TheIVText.ReplaceTextOfTextLabel("ROM4_36", "While locked on:~n~~INPUT_MELEE_ATTACK1~ to punch.~n~~INPUT_MELEE_ATTACK2~ for alternative punch.~n~~s~~INPUT_MELEE_KICK~ to kick.");
             //Prone.Init();
@@ -114,6 +119,8 @@ namespace MoveImprove.ivsdk
         {
             if (meleeStamina)
                 MeleeStamina.IngameStart();
+
+            FasterJackingScript.UnInit();
         }
         private static bool InitialChecks()
         {
@@ -139,18 +146,15 @@ namespace MoveImprove.ivsdk
             GET_CURRENT_CHAR_WEAPON(PlayerHandle, out int pWeap);
 
             PedHelper.GrabAllPeds();
+
             FastAnims.Tick();
             CounterStrikes.Tick();
-            //Prone.Tick();
             FlipsNShit.Tick();
             AdvancedClimbing.Tick();
-            if (FixRagdoll)
-                RagdollFix.Tick();
-            if (Improve180Turn)
-                Alt180TurnScript.Tick();
-                RunRework.Tick();
-            if (FasterJacking)
-                FasterJackingScript.Tick();
+            RagdollFix.Tick();
+            Alt180TurnScript.Tick();
+            RunRework.Tick();
+            FasterJackingScript.Tick();
             if (GrabEnable)
                 GrabAndThrow.Tick();
             if (JumpTurnEnable)
@@ -159,9 +163,14 @@ namespace MoveImprove.ivsdk
                 GetUpCrouched.Tick();
             if (TightTurn)
                 TurnHelp.Tick();
-            //SwitchTargets.Tick();
             if (meleeStamina)
                 MeleeStamina.Tick();
+            if (extremeClimbing)
+                ExtremeClimbing.Tick();
+
+            //SwitchTargets.Tick();
+            //Prone.Tick();
+            //MeleeGun.Tick();
         }
         // Credits to catsmackaroo
         public static float Clamp(float value, float min, float max)
@@ -215,8 +224,9 @@ namespace MoveImprove.ivsdk
             mouseSens = settings.GetFloat("MAIN", "OnLedgeMouseSensitivity", 0.5f);
             stickSens = settings.GetFloat("MAIN", "OnLedgeStickSensitivity", 0.5f);
             meleeStamina = settings.GetBoolean("MELEE STAMINA", "Enable", true);
+            extremeClimbing = settings.GetBoolean("MAIN", "ExtremeClimbing", false);
+            veryExtremeClimbing = settings.GetBoolean("OTHER FEATURES", "VeryExtremeClimbing", false);
 
-            ExtremeClimbing = settings.GetBoolean("OTHER FEATURES", "ExtremeClimbing", false);
             ClimbDown = settings.GetBoolean("OTHER FEATURES", "ClimbDown", false);
             FlipEnable = settings.GetBoolean("OTHER FEATURES", "FlipEnable", false);
             TackleEnable = settings.GetBoolean("OTHER FEATURES", "TackleEnable", false);

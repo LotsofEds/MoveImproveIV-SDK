@@ -20,8 +20,10 @@ namespace MoveImprove.ivsdk
         private static bool fatigueEnable;
         private static float fatigueRecovery;
         private static float fatigueDrain;
+        private static float staminaMax;
 
         // OtherShit
+        private static bool gameStart;
         private static string currMoveSet;
         private static string currMoveName;
         //private static float staminaBar;
@@ -29,11 +31,14 @@ namespace MoveImprove.ivsdk
         private static float animTime;
         private static int tex= 0;
         private static SettingsFile meleeSettings;
+        private static SettingsFile CRAPsettings;
+        private static bool hasCRAP;
         public static void Init(SettingsFile settings)
         {
+            if (!Main.meleeStamina)
+                return;
+
             moveList.Clear();
-            Main.staminaBar = 100;
-            Main.maxStamina = 100;
 
             debug = settings.GetBoolean("MELEE STAMINA", "Debug", false);
             minSpeed = settings.GetFloat("MELEE STAMINA", "TiredMinSpeed", 0.75f);
@@ -43,9 +48,20 @@ namespace MoveImprove.ivsdk
             fatigueEnable = settings.GetBoolean("MELEE STAMINA", "FatigueEnable", false);
             fatigueRecovery = settings.GetFloat("MELEE STAMINA", "FatigueRecoveryRate", 1.0f);
             fatigueDrain = settings.GetFloat("MELEE STAMINA", "RunningFatigue", 1.0f);
+            staminaMax = settings.GetFloat("MELEE STAMINA", "MaxStamina", 100.0f);
+
+            Main.maxStamina = staminaMax;
+            Main.staminaBar = Main.maxStamina;
 
             meleeSettings = new SettingsFile(string.Format("{0}\\IVSDKDotNet\\scripts\\MoveImprove\\MoveList.ini", IVGame.GameStartupPath));
             meleeSettings.Load();
+
+            if (System.IO.File.Exists(string.Format("{0}\\IVSDKDotNet\\scripts\\MissionStuff\\SaveData.ini", IVGame.GameStartupPath)))
+            {
+                CRAPsettings = new SettingsFile(string.Format("{0}\\IVSDKDotNet\\scripts\\MissionStuff\\SaveData.ini", IVGame.GameStartupPath));
+                CRAPsettings.Load();
+                hasCRAP = true;
+            }
 
             string[] listOfMoves = meleeSettings.GetSectionNames();
 
@@ -61,16 +77,33 @@ namespace MoveImprove.ivsdk
                 moveList[i].LossEnd = meleeSettings.GetFloat(listOfMoves[i], "LossEnd", 0);
             }
         }
-        public static void Uninit()
+        public static void UnInit()
         {
             moveList.Clear();
         }
         public static void IngameStart()
         {
             fTimer = 0;
+            gameStart = false;
+        }
+        private static void GetMaxStamina()
+        {
+            if (!gameStart && hasCRAP)
+            {
+                staminaMax += CRAPsettings.GetFloat(IVGenericGameStorage.ValidSaveName, "MeleeStaminaAdd", 0);
+
+                Main.maxStamina = staminaMax;
+                Main.staminaBar = Main.maxStamina;
+
+                gameStart = true;
+            }
         }
         public static void Tick()
         {
+            if (!Main.meleeStamina)
+                return;
+
+            GetMaxStamina();
             ProcessReduceStamina();
 
             if (Main.gTimer >= fTimer + recoverTime)
@@ -92,7 +125,7 @@ namespace MoveImprove.ivsdk
                 Main.staminaBar += Main.frameTime * recoverySpeed;
             }
 
-            Main.maxStamina = Main.Clamp(Main.maxStamina, 10, 100);
+            Main.maxStamina = Main.Clamp(Main.maxStamina, 10, staminaMax);
             Main.staminaBar = Main.Clamp(Main.staminaBar, 0, Main.maxStamina);
 
             if (Main.staminaBar <= tiredThresh)
@@ -146,16 +179,16 @@ namespace MoveImprove.ivsdk
             {
                 //DRAW_RECT(0.105f, 0.967f, 0.110f, 0.02f, 0, 0, 0, 120);
 
-                float barSize = (int)Main.staminaBar / 1000.0f;
+                float barSize = (int)Main.staminaBar / (staminaMax * 10);
                 float barPos = 0.105f - (0.1f - barSize) / 2;
                 //int barCol = (int)(Main.staminaBar * 2.55f);
 
-                float maxSize = (int)Main.maxStamina / 1000.0f;
+                float maxSize = (int)Main.maxStamina / (staminaMax * 10);
                 float maxPos = 0.105f - (0.1f - maxSize) / 2;
 
-                int colR = (int)((153 - 87) * (-Main.staminaBar / 100));
-                int colG = (int)((69 - 124) * (-Main.staminaBar / 100));
-                int colB = (int)((69 - 88) * (-Main.staminaBar / 100));
+                int colR = (int)((153 - 87) * (-Main.staminaBar / staminaMax));
+                int colG = (int)((69 - 124) * (-Main.staminaBar / staminaMax));
+                int colB = (int)((69 - 88) * (-Main.staminaBar / staminaMax));
 
                 Color barCol= Color.FromArgb(255, 153 + colR, 69 + colG, 69 + colB);
                 DRAW_RECT(0.105f, 0.967f, 0.104f, 0.015f, 0, 0, 0, 180);
@@ -174,7 +207,7 @@ namespace MoveImprove.ivsdk
                     GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, moveList[i].MoveSet, moveList[i].MoveName, out animTime);
                     if (!moveList[i].LongAnim)
                     {
-                        if (animTime <= 0.2f && animTime >= 0 && (currMoveSet != moveList[i].MoveSet || currMoveName != moveList[i].MoveName))
+                        if (animTime <= 0.3f && animTime > 0 && (currMoveSet != moveList[i].MoveSet || currMoveName != moveList[i].MoveName))
                         {
                             Main.maxStamina -= moveList[i].FatigueAmount;
                             Main.staminaBar -= moveList[i].StaminaLoss;
@@ -187,7 +220,7 @@ namespace MoveImprove.ivsdk
                         }
                         else
                         {
-                            if (animTime > 0.2)
+                            if (animTime > 0.3)
                                 ResetAnims();
                             GET_GAME_TIMER(out fTimer);
                         }

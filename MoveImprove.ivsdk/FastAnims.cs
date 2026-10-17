@@ -12,18 +12,74 @@ namespace MoveImprove.ivsdk
     internal class FastAnims
     {
         private static float movepntr;
-        private static uint fTimer;
-        private static bool speedUp;
-        private static bool getUp;
         private static bool boostToCover;
-        public static Vector3 PlyrPos;
-        private static List<string> animList = new List<string>();
-        private static float groundPos;
+
+        private static string[] HolsterAnims;
+        private static string[] CoverDiveAnims;
+        private static string[] CoverAnims;
+        private static string[] ClimbAnims;
+        private static string[] CoverStrafeAnims;
+        private static string[] CrouchAnims;
+        private static string[] PickupAnims;
         public static void Init(SettingsFile settings)
         {
             string animString = settings.GetValue("MAIN", "HolsterAnims", "");
             foreach (var animName in animString.Split(','))
-                animList.Add(animName);
+                Main.animList.Add(animName);
+
+            HolsterAnims = GetHolsterAnims();
+            CoverDiveAnims = GetCoverDiveAnims();
+            CoverAnims = GetCoverAnims();
+            ClimbAnims = GetClimbAnims();
+            CoverStrafeAnims = GetCoverStrafeAnims();
+            CrouchAnims = GetCrouchAnims();
+            PickupAnims = GetPickupAnims();
+        }
+        private static string[] GetHolsterAnims()
+        {
+            string[] anims = new string[] { "aim_2_holster", "holster_2_aim", "holster", "holster_crouch", "unholster", "unholster_crouch" };
+
+            return anims;
+        }
+        private static string[] GetCoverDiveAnims()
+        {
+            string[] anims = new string[] { "high_l_pistol", "low_l_pistol", "low_r_pistol", "high_l_pistol_short", "high_r_pistol_short","low_l_pistol_short",
+                "low_r_pistol_short", "high_l_rifle", "high_r_rifle", "low_l_rifle", "low_r_rifle", "high_l_rifle_short", "high_r_rifle_short", "low_l_rifle_short",
+                "low_r_rifle_short"};
+
+            return anims;
+        }
+        public static string[] GetCoverAnims()
+        {
+            string[] anims = new string[] { "cover_l_low_centre", "cover_r_low_centre", "cover_l_high_centre", "cover_r_high_centre", "cover_l_low_corner",
+                "cover_r_low_corner", "cover_l_high_corner", "cover_r_high_corner"};
+
+            return anims;
+        }
+        private static string[] GetClimbAnims()
+        {
+            string[] anims = new string[] { "hang_to_waist", "waist_to_stand_unarmed", "landing_head_height", "landing_waist_height", "waist_to_vault",
+                "waist_to_vault_shallow", "shimmy_l", "shimmy_r"};
+
+            return anims;
+        }
+        private static string[] GetCoverStrafeAnims()
+        {
+            string[] anims = new string[] { "move_combat_strafe", "move_rifle", "move_rpg", "move_crouch", "move_crouch_rifle", "move_crouch_rpg"};
+
+            return anims;
+        }
+        private static string[] GetCrouchAnims()
+        {
+            string[] anims = new string[] { "move_crouch", "move_crouch_rifle", "move_crouch_rpg" };
+
+            return anims;
+        }
+        private static string[] GetPickupAnims()
+        {
+            string[] anims = new string[] { "pickup_high", "pickup_low", "pickup_med" };
+
+            return anims;
         }
         private static void CancelAnimEarly(string animSet, string animName, float stopTime)
         {
@@ -54,136 +110,37 @@ namespace MoveImprove.ivsdk
                 }
             }
         }
-        private static void StandUp()
-        {
-            if (!IS_PED_RAGDOLL(Main.PlayerHandle))
-            {
-                if (!HAVE_ANIMS_LOADED("move_crouch"))
-                    REQUEST_ANIMS("move_crouch");
-                if (!HAVE_ANIMS_LOADED("ragdoll_trans"))
-                    REQUEST_ANIMS("ragdoll_trans");
-                Main.PlayerPed.ActivateDrunkRagdoll(500);
-                GET_GAME_TIMER(out fTimer);
-                getUp = true;
-            }
-        }
         public static void Tick()
         {
-            if (getUp)
-            {
-                if (Main.gTimer >= fTimer + 440)
-                {
-                    GET_GROUND_Z_FOR_3D_COORD(PlyrPos, out float groundZ);
-                    if ((PlyrPos.Z - groundZ) <= 0.65f)
-                        groundPos = (PlyrPos.Z - groundZ);
-                    else
-                        groundPos = 0.65f;
-                    FREEZE_CHAR_POSITION(Main.PlayerHandle, false);
-                    SET_CHAR_COORDINATES(Main.PlayerHandle, new Vector3(PlyrPos.X, PlyrPos.Y, (PlyrPos.Z - groundPos)));
-                    _TASK_PLAY_ANIM_NON_INTERRUPTABLE(Main.PlayerHandle, "recover_balance", "ragdoll_trans", 2, 0, 0, 0, 0, -1);
-                    //REMOVE_ANIMS("ragdoll_trans");
-                    speedUp = true;
-                    getUp = false;
-                }
-                else if (Main.gTimer >= fTimer + 90 && !IS_PED_RAGDOLL(Main.PlayerHandle))
-                    FREEZE_CHAR_POSITION(Main.PlayerHandle, true);
-                else if (Main.gTimer >= fTimer + 40 && IS_PED_RAGDOLL(Main.PlayerHandle))
-                {
-                    PlyrPos = Main.PlayerPos;
-                    BLEND_FROM_NM_WITH_ANIM(Main.PlayerHandle, "move_crouch", "crouchidle2idle", 10, 0, 0, 0);
-                }
-            }
-            if (speedUp)
-            {
-                if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "ragdoll_trans", "recover_balance"))
-                {
-                    SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "ragdoll_trans", "recover_balance", 0.8f);
-                    speedUp = false;
-                }
-            }
             if (!IS_PED_IN_COVER(Main.PlayerHandle))
             {
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_dive", "high_l_pistol", Main.GetInCoverSpeed);
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_dive", "high_r_pistol", Main.GetInCoverSpeed);
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_dive", "low_l_pistol", Main.GetInCoverSpeed);
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_dive", "low_r_pistol", Main.GetInCoverSpeed);
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_dive", "high_l_pistol_short", Main.GetInCoverSpeed);
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_dive", "high_r_pistol_short", Main.GetInCoverSpeed);
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_dive", "low_l_pistol_short", Main.GetInCoverSpeed);
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_dive", "low_r_pistol_short", Main.GetInCoverSpeed);
-
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_dive", "high_l_rifle", Main.GetInCoverSpeed);
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_dive", "high_r_rifle", Main.GetInCoverSpeed);
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_dive", "low_l_rifle", Main.GetInCoverSpeed);
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_dive", "low_r_rifle", Main.GetInCoverSpeed);
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_dive", "high_l_rifle_short", Main.GetInCoverSpeed);
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_dive", "high_r_rifle_short", Main.GetInCoverSpeed);
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_dive", "low_l_rifle_short", Main.GetInCoverSpeed);
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_dive", "low_r_rifle_short", Main.GetInCoverSpeed);
-
-                CoverBoost("cover_dive", "high_l_pistol");
-                CoverBoost("cover_dive", "high_r_pistol");
-                CoverBoost("cover_dive", "low_l_pistol");
-                CoverBoost("cover_dive", "low_r_pistol");
-                CoverBoost("cover_dive", "high_l_pistol_short");
-                CoverBoost("cover_dive", "high_r_pistol_short");
-                CoverBoost("cover_dive", "low_l_pistol_short");
-                CoverBoost("cover_dive", "low_r_pistol_short");
-                CoverBoost("cover_dive", "high_l_rifle");
-                CoverBoost("cover_dive", "high_r_rifle");
-                CoverBoost("cover_dive", "low_l_rifle");
-                CoverBoost("cover_dive", "low_r_rifle");
-                CoverBoost("cover_dive", "high_l_rifle_short");
-                CoverBoost("cover_dive", "high_r_rifle_short");
-                CoverBoost("cover_dive", "low_l_rifle_short");
-                CoverBoost("cover_dive", "low_r_rifle_short");
-
-                CancelAnimEarly("cover_dive", "high_l_pistol", 0.83f);
-                CancelAnimEarly("cover_dive", "high_r_pistol", 0.83f);
-                CancelAnimEarly("cover_dive", "low_l_pistol", 0.83f);
-                CancelAnimEarly("cover_dive", "low_r_pistol", 0.83f);
-                CancelAnimEarly("cover_dive", "high_l_pistol_short", 0.83f);
-                CancelAnimEarly("cover_dive", "high_r_pistol_short", 0.83f);
-                CancelAnimEarly("cover_dive", "low_l_pistol_short", 0.83f);
-                CancelAnimEarly("cover_dive", "low_r_pistol_short", 0.83f);
-                CancelAnimEarly("cover_dive", "high_l_rifle", 0.83f);
-                CancelAnimEarly("cover_dive", "high_r_rifle", 0.83f);
-                CancelAnimEarly("cover_dive", "low_l_rifle", 0.83f);
-                CancelAnimEarly("cover_dive", "low_r_rifle", 0.83f);
-                CancelAnimEarly("cover_dive", "high_l_rifle_short", 0.83f);
-                CancelAnimEarly("cover_dive", "high_r_rifle_short", 0.83f);
-                CancelAnimEarly("cover_dive", "low_l_rifle_short", 0.83f);
-                CancelAnimEarly("cover_dive", "low_r_rifle_short", 0.83f);
-
-                if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_crouch", "crouchidle2idle") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_crouch_rifle", "crouchidle2idle") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "pickup_object", "pickup_high") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "pickup_object", "pickup_low") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "pickup_object", "pickup_med") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "ev_dives", "plyr_roll_left") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "ev_dives", "plyr_roll_right"))
+                foreach (string anim in CoverDiveAnims)
                 {
-                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "pickup_object", "pickup_high", (Main.PickupObjectSpeed));
-                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "pickup_object", "pickup_low", (Main.PickupObjectSpeed));
-                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "pickup_object", "pickup_med", (Main.PickupObjectSpeed));
-                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "ev_dives", "plyr_roll_left", (Main.CombatRollSpeed));
-                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "ev_dives", "plyr_roll_right", (Main.CombatRollSpeed));
-                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "move_crouch", "crouchidle2idle", (Main.CrouchingSpeed));
-                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "move_crouch_rifle", "crouchidle2idle", (Main.CrouchingSpeed));
+                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_dive", anim, Main.GetInCoverSpeed);
+                    CoverBoost("cover_dive", anim);
+                    CancelAnimEarly("cover_dive", "high_l_pistol", 0.83f);
                 }
 
-                else if (IS_CHAR_DUCKING(Main.PlayerHandle))
+                foreach (string animSet in CrouchAnims)
                 {
-                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "move_crouch", "idle2crouchidle", (Main.CrouchingSpeed));
-                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "move_crouch_rifle", "idle2crouchidle", (Main.CrouchingSpeed));
-                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "move_crouch_rpg", "idle2crouchidle", (Main.CrouchingSpeed));
+                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, animSet, "crouchidle2idle", (Main.CrouchingSpeed));
+                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, animSet, "idle2crouchidle", (Main.CrouchingSpeed));
                 }
 
-                else if (IS_PED_CLIMBING(Main.PlayerHandle))
+                foreach (string animName in PickupAnims)
                 {
-                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "climb_std", "hang_to_waist", (Main.ClimbAndShimmySpeed));
-                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "climb_std", "waist_to_stand_rifle", (Main.ClimbAndShimmySpeed));
-                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "climb_std", "waist_to_stand_unarmed", (Main.ClimbAndShimmySpeed));
-                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "climb_std", "landing_head_height", (Main.ClimbAndShimmySpeed));
-                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "climb_std", "landing_waist_height", (Main.ClimbAndShimmySpeed));
-                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "climb_std", "waist_to_vault", (Main.ClimbAndShimmySpeed));
-                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "climb_std", "waist_to_vault_shallow", (Main.ClimbAndShimmySpeed));
-                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "climb_std", "shimmy_l", (Main.ClimbAndShimmySpeed));
-                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "climb_std", "shimmy_r", (Main.ClimbAndShimmySpeed));
+                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "pickup_object", animName, (Main.PickupObjectSpeed));
+                }
+
+                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "ev_dives", "plyr_roll_left", (Main.CombatRollSpeed));
+                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "ev_dives", "plyr_roll_right", (Main.CombatRollSpeed));
+
+                if (IS_PED_CLIMBING(Main.PlayerHandle))
+                {
+                    foreach (string animName in ClimbAnims)
+                    {
+                        SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "climb_std", animName, (Main.ClimbAndShimmySpeed));
+                    }
 
                     if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "climb_std", "landing_stretch_height"))
                     {
@@ -193,111 +150,21 @@ namespace MoveImprove.ivsdk
                             SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "climb_std", "landing_stretch_height", 2.0f);
                         }
                     }
-                    if (Main.ExtremeClimbing == true && !NativeControls.IsGameKeyPressed(0, GameKey.Sprint))
-                    {
-                        if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "climb_std", "vault_end"))
-                        {
-                            GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "climb_std", "vault_end", out movepntr);
-                            if (movepntr < 0.27 && !NativeControls.IsGameKeyPressed(0, GameKey.Sprint) && IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "climb_std", "vault_end"))
-                            {
-                                GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "climb_std", "vault_end", out movepntr);
-                                if (movepntr > 0.07 && movepntr < 0.27)
-                                    StandUp();
-                            }
-                        }
-
-                        else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "climb_std", "vault_end_r"))
-                        {
-                            GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "climb_std", "vault_end_r", out movepntr);
-                            if (movepntr < 0.25 && !NativeControls.IsGameKeyPressed(0, GameKey.Sprint) && IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "climb_std", "vault_end_r"))
-                            {
-                                GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "climb_std", "vault_end_r", out movepntr);
-                                if (movepntr > 0.05 && movepntr < 0.25)
-                                    StandUp();
-                            }
-                        }
-
-                        else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "climb_std", "waist_to_vault"))
-                        {
-                            GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "climb_std", "waist_to_vault", out movepntr);
-                            if (movepntr > 0.52 && movepntr < 0.6 && !NativeControls.IsGameKeyPressed(0, GameKey.Sprint) && IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "climb_std", "waist_to_vault"))
-                                StandUp();
-                        }
-
-                        else if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "climb_std", "waist_to_vault_shallow"))
-                        {
-                            GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "climb_std", "waist_to_vault_shallow", out movepntr);
-                            if (movepntr > 0.52 && movepntr < 0.6 && !NativeControls.IsGameKeyPressed(0, GameKey.Sprint) && IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "climb_std", "waist_to_vault_shallow"))
-                                StandUp();
-                        }
-                    }
                 }
             }
 
             else if (IS_PED_IN_COVER(Main.PlayerHandle) && !IS_CHAR_SHOOTING(Main.PlayerHandle))
             {
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_l_low_centre", "pistol_flip_180", (Main.CoverTurnSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_l_low_centre", "unarmed_flip_180", (Main.CoverTurnSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_l_low_centre", "rifle_flip_180", (Main.CoverTurnSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_r_low_centre", "pistol_flip_180", (Main.CoverTurnSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_r_low_centre", "unarmed_flip_180", (Main.CoverTurnSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_r_low_centre", "rifle_flip_180", (Main.CoverTurnSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_l_high_centre", "pistol_flip_180", (Main.CoverTurnSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_l_high_centre", "unarmed_flip_180", (Main.CoverTurnSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_l_high_centre", "rifle_flip_180", (Main.CoverTurnSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_r_high_centre", "pistol_flip_180", (Main.CoverTurnSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_r_high_centre", "unarmed_flip_180", (Main.CoverTurnSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_r_high_centre", "rifle_flip_180", (Main.CoverTurnSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_l_low_corner", "pistol_flip_180", (Main.CoverTurnSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_l_low_corner", "unarmed_flip_180", (Main.CoverTurnSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_l_low_corner", "rifle_flip_180", (Main.CoverTurnSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_r_low_corner", "pistol_flip_180", (Main.CoverTurnSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_r_low_corner", "unarmed_flip_180", (Main.CoverTurnSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_r_low_corner", "rifle_flip_180", (Main.CoverTurnSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_l_high_corner", "pistol_flip_180", (Main.CoverTurnSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_l_high_corner", "unarmed_flip_180", (Main.CoverTurnSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_l_high_corner", "rifle_flip_180", (Main.CoverTurnSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_r_high_corner", "pistol_flip_180", (Main.CoverTurnSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_r_high_corner", "unarmed_flip_180", (Main.CoverTurnSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_r_high_corner", "rifle_flip_180", (Main.CoverTurnSpeed));
+                foreach (string animSet in CoverAnims)
+                {
+                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, animSet, "pistol_flip_180", (Main.CoverTurnSpeed));
+                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, animSet, "unarmed_flip_180", (Main.CoverTurnSpeed));
 
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_l_low_centre", "pistol_peek", (Main.PeekFromCoverSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_l_low_centre", "rifle_peek", (Main.PeekFromCoverSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_r_low_centre", "pistol_peek", (Main.PeekFromCoverSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_r_low_centre", "rifle_peek", (Main.PeekFromCoverSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_l_low_corner", "pistol_peek", (Main.PeekFromCoverSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_l_low_corner", "rifle_peek", (Main.PeekFromCoverSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_r_low_corner", "pistol_peek", (Main.PeekFromCoverSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_r_low_corner", "rifle_peek", (Main.PeekFromCoverSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_l_high_corner", "pistol_peek", (Main.PeekFromCoverSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_l_high_corner", "rifle_peek", (Main.PeekFromCoverSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_r_high_corner", "pistol_peek", (Main.PeekFromCoverSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_r_high_corner", "rifle_peek", (Main.PeekFromCoverSpeed));
-
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_l_low_centre", "pistol_normal_fire_intro", (Main.PeekFromCoverSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_l_low_centre", "rifle_normal_fire_intro", (Main.PeekFromCoverSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_r_low_centre", "pistol_normal_fire_intro", (Main.PeekFromCoverSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_r_low_centre", "rifle_normal_fire_intro", (Main.PeekFromCoverSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_l_low_corner", "pistol_normal_fire_intro", (Main.PeekFromCoverSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_l_low_corner", "rifle_normal_fire_intro", (Main.PeekFromCoverSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_r_low_corner", "pistol_normal_fire_intro", (Main.PeekFromCoverSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_r_low_corner", "rifle_normal_fire_intro", (Main.PeekFromCoverSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_l_high_corner", "pistol_normal_fire_intro", (Main.PeekFromCoverSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_l_high_corner", "rifle_normal_fire_intro", (Main.PeekFromCoverSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_r_high_corner", "pistol_normal_fire_intro", (Main.PeekFromCoverSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_r_high_corner", "rifle_normal_fire_intro", (Main.PeekFromCoverSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_l_low_centre", "pistol_normal_fire_outro", (Main.PeekFromCoverSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_l_low_centre", "rifle_normal_fire_outro", (Main.PeekFromCoverSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_r_low_centre", "pistol_normal_fire_outro", (Main.PeekFromCoverSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_r_low_centre", "rifle_normal_fire_outro", (Main.PeekFromCoverSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_l_low_corner", "pistol_normal_fire_outro", (Main.PeekFromCoverSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_l_low_corner", "rifle_normal_fire_outro", (Main.PeekFromCoverSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_r_low_corner", "pistol_normal_fire_outro", (Main.PeekFromCoverSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_r_low_corner", "rifle_normal_fire_outro", (Main.PeekFromCoverSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_l_high_corner", "pistol_normal_fire_outro", (Main.PeekFromCoverSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_l_high_corner", "rifle_normal_fire_outro", (Main.PeekFromCoverSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_r_high_corner", "pistol_normal_fire_outro", (Main.PeekFromCoverSpeed));
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "cover_r_high_corner", "rifle_normal_fire_outro", (Main.PeekFromCoverSpeed));
+                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, animSet, "pistol_peek", (Main.PeekFromCoverSpeed));
+                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, animSet, "rifle_peek", (Main.PeekFromCoverSpeed));
+                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, animSet, "pistol_normal_fire_intro", (Main.PeekFromCoverSpeed));
+                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, animSet, "rifle_normal_fire_intro", (Main.PeekFromCoverSpeed));
+                }
 
                 // l_high_corner
                 if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "cover_l_high_corner", "ak47_blindfire"))
@@ -385,28 +252,25 @@ namespace MoveImprove.ivsdk
 
                 if (NativeControls.IsGameKeyPressed(0, GameKey.Sprint))
                 {
-                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "move_combat_strafe", "walk", 1.5f);
-                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "move_rifle", "walk", 1.5f);
-                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "move_rpg", "walk", 1.5f);
-                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "move_crouch", "walk", 1.75f);
-                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "move_crouch_rifle", "walk", 1.75f);
-                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "move_crouch_rpg", "walk", 1.75f);
+                    foreach (string moveSet in CoverStrafeAnims)
+                    {
+                        if (moveSet.Contains("crouch"))
+                            SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "move_combat_strafe", "walk", 1.75f);
+                        else
+                            SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "move_combat_strafe", "walk", 1.5f);
+                    }
 
                     if (Main.StaminaDrain && isMovingInCover())
                         Main.PlayerPed.PlayerInfo.Stamina -= Main.RunDrain * Main.frameTime;
                 }
             }
 
-            foreach (string animName in animList)
+            foreach (string animSet in Main.animList)
             {
-                if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, animName, "aim_2_holster") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, animName, "holster") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, animName, "holster_2_aim") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, animName, "holster_crouch") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, animName, "unholster_crouch") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, animName, "unholster"))
+                foreach (string animName in HolsterAnims)
                 {
-                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, animName, "aim_2_holster", Main.HolsterSpeed);
-                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, animName, "holster", Main.HolsterSpeed);
-                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, animName, "holster_2_aim", Main.HolsterSpeed);
-                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, animName, "holster_crouch", Main.HolsterSpeed);
-                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, animName, "unholster_crouch", Main.HolsterSpeed);
-                    SET_CHAR_ANIM_SPEED(Main.PlayerHandle, animName, "unholster", Main.HolsterSpeed);
+                    if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, animSet, animName))
+                        SET_CHAR_ANIM_SPEED(Main.PlayerHandle, animSet, animName, Main.HolsterSpeed);
                 }
             }
 
@@ -466,7 +330,9 @@ namespace MoveImprove.ivsdk
         }
         private static bool isMovingInCover()
         {
-            if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_combat_strafe", "walk") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_rifle", "walk") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_rpg", "walk") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_crouch", "walk") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_crouch_rifle", "walk") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_crouch_rpg", "walk"))
+            if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_combat_strafe", "walk") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_rifle", "walk")
+                || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_rpg", "walk") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_crouch", "walk")
+                || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_crouch_rifle", "walk") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_crouch_rpg", "walk"))
                 return true;
             else
                 return false;

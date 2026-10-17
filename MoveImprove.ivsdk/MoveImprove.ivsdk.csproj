@@ -53,10 +53,12 @@
   <ItemGroup>
     <Compile Include="AdvancedClimbing.cs" />
     <Compile Include="Alt180TurnScript.cs" />
+    <Compile Include="ExtremeClimbing.cs" />
     <Compile Include="FlipsNShit.cs" />
     <Compile Include="CounterStrikes.cs" />
     <Compile Include="FastAnims.cs" />
     <Compile Include="FasterJackingScript.cs" />
+    <Compile Include="MeleeGun.cs" />
     <Compile Include="MeleeStamina.cs" />
     <Compile Include="RunRework.cs" />
     <Compile Include="GetUpCrouched.cs" />

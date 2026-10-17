@@ -34,10 +34,16 @@ namespace MoveImprove.ivsdk
         }
         public static void Init(SettingsFile settings)
         {
+            if (!Main.Improve180Turn)
+                return;
+
             Remove180Anim = settings.GetBoolean("MAIN", "Remove180Anim", false);
         }
         public static void Tick()
         {
+            if (!Main.Improve180Turn)
+                return;
+
             if (NativeControls.IsGameKeyPressed(0, GameKey.Sprint) && (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_player", "walk_turn_180_l") || IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "move_player", "walk_turn_180_r")))
             {
                 SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "move_player", "walk_turn_180_l", 1.5f);

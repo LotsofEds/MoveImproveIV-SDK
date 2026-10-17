@@ -48,16 +48,9 @@ namespace MoveImprove.ivsdk
                 if (!IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "veh@low", "jack_perp_ds") && !IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "veh@low", "jack_perp_ps") && (NativeControls.IsGameKeyPressed(0, Main.GrabKey) || NativeControls.IsGameKeyPressed(0, Main.GrabKey)))
                 {
                     bool canThrow = false;
-                    if (!HAVE_ANIMS_LOADED("misspackie1"))
-                        REQUEST_ANIMS("misspackie1");
-                    if (!HAVE_ANIMS_LOADED("visemes@m_hi"))
-                        REQUEST_ANIMS("visemes@m_hi");
+
                     if (!HAVE_ANIMS_LOADED("missray2"))
                         REQUEST_ANIMS("missray2");
-                    //if (!HAVE_ANIMS_LOADED("veh@bike_dirt"))
-                    //REQUEST_ANIMS("veh@bike_dirt");
-                    //if (!HAVE_ANIMS_LOADED("veh@low"))
-                    //REQUEST_ANIMS("veh@low");
                     if (!HAVE_ANIMS_LOADED("veh@std"))
                         REQUEST_ANIMS("veh@std");
 
@@ -86,67 +79,36 @@ namespace MoveImprove.ivsdk
                     {
                         if (NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft) || NativeControls.IsGameKeyPressed(0, GameKey.MoveLeft))
                         {
-                            _TASK_PLAY_ANIM(Main.PlayerHandle, "jack_perp_ds", "veh@std", 4.0f, 0, 0, 0, 0, -1);
-                            Main.staminaBar -= staminaDrain;
-                            Main.maxStamina -= fatigueDrain;
+                            PlayThrowAnim("veh@std", "jack_perp_ds");
                             leftCounter = true;
                         }
                         else if (NativeControls.IsGameKeyPressed(0, GameKey.MoveRight) || NativeControls.IsGameKeyPressed(0, GameKey.MoveRight))
                         {
-                            _TASK_PLAY_ANIM(Main.PlayerHandle, "jack_perp_ps", "veh@std", 4.0f, 0, 0, 0, 0, -1);
-                            Main.staminaBar -= staminaDrain;
-                            Main.maxStamina -= fatigueDrain;
+                            PlayThrowAnim("veh@std", "jack_perp_ps");
                             rightCounter = true;
                         }
                         else if (NativeControls.IsGameKeyPressed(0, GameKey.MoveForward) || NativeControls.IsGameKeyPressed(0, GameKey.MoveForward))
                         {
-                            _TASK_PLAY_ANIM(Main.PlayerHandle, "gbge_throwrubbish", "missray2", 4.0f, 0, 0, 0, 0, -1);
-                            Main.staminaBar -= staminaDrain;
-                            Main.maxStamina -= fatigueDrain;
+                            PlayThrowAnim("missray2", "gbge_throwrubbish");
                             fwdCounter = true;
                         }
                     }
                 }
             }
-            if (leftCounter && IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "veh@std", "jack_perp_ds"))
+            if (leftCounter)
             {
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "veh@std", "jack_perp_ds", 1.65f);
-                GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "veh@std", "jack_perp_ds", out float plyrTime);
-                if (plyrTime < 0.2)
-                {
-                    SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "veh@std", "jack_perp_ds", 0.5f);
-                }
-                else if (plyrTime > 0.9 && plyrTime < 0.95)
-                {
-                    //SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "veh@std", "jack_perp_ds", 0.95f);
+                if (ProcessThrowAnim("veh@std", "jack_perp_ds", 1.65f, 0.5f, 0.9f))
                     leftCounter = false;
-                }
             }
-            else if (rightCounter && IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "veh@std", "jack_perp_ps"))
+            else if (rightCounter)
             {
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "veh@std", "jack_perp_ps", 1.85f);
-                GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "veh@std", "jack_perp_ps", out float plyrTime);
-                if (plyrTime < 0.2)
-                    SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "veh@std", "jack_perp_ps", 0.3f);
-
-                else if (plyrTime > 0.85 && plyrTime < 0.95)
-                {
-                    //_TASK_PLAY_ANIM(Main.PlayerHandle, "a", "visemes@m_hi", 8.0f, 0, 0, 0, 0, -1);
-                    //SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "visemes@m_hi", "a", 1.0f);
+                if (ProcessThrowAnim("veh@std", "jack_perp_ps", 1.85f, 0.3f, 0.85f))
                     rightCounter = false;
-                }
             }
-            else if (fwdCounter && IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "missray2", "gbge_throwrubbish"))
+            else if (fwdCounter)
             {
-                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "missray2", "gbge_throwrubbish", 1.65f);
-                GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "missray2", "gbge_throwrubbish", out float plyrTime);
-                if (plyrTime < 0.2)
-                    SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "missray2", "gbge_throwrubbish", 0.35f);
-
-                else if (plyrTime > 0.7 && plyrTime < 0.85)
-                {
+                if (ProcessThrowAnim("missray2", "gbge_throwrubbish", 1.65f, 0.35f, 0.7f))
                     fwdCounter = false;
-                }
             }
 
             if (DOES_CHAR_EXIST(currPed))
@@ -169,6 +131,30 @@ namespace MoveImprove.ivsdk
                 else if (fwdCounter && IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, "missray2", "gbge_throwrubbish"))
                     ThrowPed(dirX * 4, dirY * 4, 0);
             }
+        }
+
+        private static void PlayThrowAnim(string animSet, string animName)
+        {
+            _TASK_PLAY_ANIM(Main.PlayerHandle, animName, animSet, 4.0f, 0, 0, 0, 0, -1);
+            Main.staminaBar -= staminaDrain;
+            Main.maxStamina -= fatigueDrain;
+        }
+
+        private static bool ProcessThrowAnim(string animSet, string animName, float speed, float timeSet, float timeEnd)
+        {
+            bool stopThrow = false;
+            if (IS_CHAR_PLAYING_ANIM(Main.PlayerHandle, animSet, animName))
+            {
+                SET_CHAR_ANIM_SPEED(Main.PlayerHandle, "veh@std", "jack_perp_ds", speed);
+                GET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "veh@std", "jack_perp_ds", out float plyrTime);
+                if (plyrTime < 0.2f)
+                {
+                    SET_CHAR_ANIM_CURRENT_TIME(Main.PlayerHandle, "veh@std", "jack_perp_ds", timeSet);
+                }
+                else if (plyrTime > timeEnd && plyrTime < 0.99)
+                    stopThrow = true;
+            }
+            return stopThrow;
         }
     }
 }
