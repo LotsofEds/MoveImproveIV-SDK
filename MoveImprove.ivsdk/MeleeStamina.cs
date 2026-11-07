@@ -20,6 +20,7 @@ namespace MoveImprove.ivsdk
         private static bool fatigueEnable;
         private static float fatigueRecovery;
         private static float fatigueDrain;
+        private static float staminaMaxCached;
         private static float staminaMax;
 
         // OtherShit
@@ -33,6 +34,7 @@ namespace MoveImprove.ivsdk
         private static SettingsFile meleeSettings;
         private static SettingsFile CRAPsettings;
         private static bool hasCRAP;
+        private static bool getStamina;
         public static void Init(SettingsFile settings)
         {
             if (!Main.meleeStamina)
@@ -48,9 +50,9 @@ namespace MoveImprove.ivsdk
             fatigueEnable = settings.GetBoolean("MELEE STAMINA", "FatigueEnable", false);
             fatigueRecovery = settings.GetFloat("MELEE STAMINA", "FatigueRecoveryRate", 1.0f);
             fatigueDrain = settings.GetFloat("MELEE STAMINA", "RunningFatigue", 1.0f);
-            staminaMax = settings.GetFloat("MELEE STAMINA", "MaxStamina", 100.0f);
+            staminaMaxCached = settings.GetFloat("MELEE STAMINA", "MaxStamina", 100.0f);
 
-            Main.maxStamina = staminaMax;
+            Main.maxStamina = staminaMaxCached;
             Main.staminaBar = Main.maxStamina;
 
             meleeSettings = new SettingsFile(string.Format("{0}\\IVSDKDotNet\\scripts\\MoveImprove\\MoveList.ini", IVGame.GameStartupPath));
@@ -90,7 +92,8 @@ namespace MoveImprove.ivsdk
         {
             if (!gameStart && hasCRAP)
             {
-                staminaMax += CRAPsettings.GetFloat(IVGenericGameStorage.ValidSaveName, "MeleeStaminaAdd", 0);
+                CRAPsettings.Load();
+                staminaMax = staminaMaxCached + CRAPsettings.GetFloat(IVGenericGameStorage.ValidSaveName, "MeleeStaminaAdd", 0);
 
                 Main.maxStamina = staminaMax;
                 Main.staminaBar = Main.maxStamina;
@@ -102,6 +105,17 @@ namespace MoveImprove.ivsdk
         {
             if (!Main.meleeStamina)
                 return;
+
+            if (IS_MISSION_COMPLETE_PLAYING() && IS_THIS_HELP_MESSAGE_BEING_DISPLAYED("TM_2_25"))
+            {
+                if (!getStamina)
+                {
+                    getStamina = true;
+                    gameStart = false;
+                }
+            }
+            else
+                getStamina = false;
 
             GetMaxStamina();
             ProcessReduceStamina();

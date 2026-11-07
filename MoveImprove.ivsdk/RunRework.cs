@@ -24,12 +24,20 @@ namespace MoveImprove.ivsdk
                 if (Main.SprintToVehicles && !IS_CHAR_ON_FOOT(Main.PlayerHandle) && !IS_CHAR_IN_ANY_CAR(Main.PlayerHandle))
                 {
                     float moveState = Main.PlayerPed.PedMoveBlendOnFoot.MoveState;
-                    moveState += 10.0f * Main.frameTime;
-                    if (!NativeControls.IsGameKeyPressed(0, GameKey.Sprint))
-                        moveState = Main.Clamp(moveState, 0.0f, 2.0f);
+                    GET_CAR_CHAR_IS_USING(Main.PlayerHandle, out int pVeh);
 
-                    else
-                        moveState = Main.Clamp(moveState, 0.0f, 3.0f);
+                    float pSpd = 2;
+                    if (DOES_VEHICLE_EXIST(pVeh))
+                        GET_CAR_SPEED(pVeh, out pSpd);
+
+                    if (pSpd > 1.0f)
+                    {
+                        moveState += 10.0f * Main.frameTime;
+                        if (!NativeControls.IsGameKeyPressed(0, GameKey.Sprint))
+                            moveState = Main.Clamp(moveState, 0.0f, 2.0f);
+                        else
+                            moveState = Main.Clamp(moveState, 0.0f, 3.0f);
+                    }
 
                     Main.PlayerPed.PedMoveBlendOnFoot.MoveState = moveState;
                 }
